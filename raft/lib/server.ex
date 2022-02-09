@@ -11,10 +11,11 @@ def start(config, server_num) do
   config = config
     |> Configuration.node_info("Server", server_num)
     |> Debug.node_starting()
+  IO.puts "server starts"
 
   receive do
   { :BIND, servers, databaseP } ->
-    State.initialise(config, server_num, servers, databaseP)
+    State.initialise(config, server_num, servers, databaseP) # server_num: own number, servers: all the servers, databaseP: the system db
       |> Timer.restart_election_timer()
       |> Server.next()
   end # receive
@@ -22,7 +23,7 @@ end # start
 
 # _________________________________________________________ next()
 def next(s) do
-  s = s |> Server.execute_committed_entries()
+  # s = s |> Server.execute_committed_entries()
 
   curr_term = s.curr_term                          # used to discard old messages
   curr_election = s.curr_election                  # used to discard old election timeouts
@@ -35,7 +36,7 @@ def next(s) do
       |> AppendEntries.send_entries_reply_to_leader(m.leaderP, false)
 
   # ________________________________________________________
-  { :VOTE_REQUEST, mterm, m } when mterm < curr_term ->     # Reject, send votedGranted=false and newer_term in reply
+  { :VOTE_REQUEST, mterm, m } when mterm < curr_term ->     # Reject, send voted Granted=false and newer_term in reply
     s |> Debug.message("-vreq", "stale #{mterm} #{inspect m}")
       |> Vote.send_vote_reply_to_candidate(m.candidateP, false)
 
@@ -57,9 +58,9 @@ def next(s) do
       |> AppendEntries.receive_append_entries_timeout(followerP)
 
   # ________________________________________________________
-  { :VOTE_REQUEST, mterm, m } = msg ->                      # Candidate >> All
+  { :VOTE_REQUEST, candidate_term, candidate } = msg ->                      # Candidate >> All
     s |> Debug.message("-vreq", msg)
-      |> Vote.receive_vote_request_from_candidate(mterm, m)
+      |> Vote.receive_vote_request_from_candidate(candidate_term, candidate, s)
 
   { :VOTE_REPLY, mterm, m } = msg ->                        # Follower >> Candidate
     if m.election < curr_election do
@@ -93,12 +94,13 @@ def next(s) do
 end # next
 
 
-"""  Omitted
-def follower_if_higher(s, mterm) do
-def become_follower(s, mterm) do
-def become_candidate(s) do
-def become_leader(s) do
-def execute_committed_entries(s) do
-"""
+
+# """  Omitted
+# def follower_if_higher(s, mterm) do
+# def become_follower(s, mterm) do
+# def become_candidate(s) do
+# def become_leader(s) do
+# def execute_committed_entries(s) do
+# """
 
 end # Server
