@@ -15,7 +15,7 @@ def initialise(config, server_num, servers, databaseP) do
     config:       config,             # system configuration parameters (from Helper module)
     server_num:	  server_num,         # server num (for debugging)
     selfP:        self(),             # server's process id
-    servers:      servers,            # list of process id's of servers (list)
+    servers:      servers,            # list of server PIDs (list)
     num_servers:  length(servers),    # no. of servers (int)
     majority:     div(length(servers),2) + 1,  # cluster membership changes are not supported in this implementation
 
@@ -24,7 +24,7 @@ def initialise(config, server_num, servers, databaseP) do
     # ______________ elections ____________________________
     election_timer:  nil,            # one timer for all peers
     curr_election:   0,              # used to drop old electionTimeout messages and votereplies
-    voted_for:	     nil,            # num of candidate that been granted vote incl self (int)
+    voted_for:	     nil,            # candidate that been granted vote incl self (server or nil)
     voted_by:        MapSet.new,     # set of processes that have voted for candidate incl. candidate (list/set)
 
     append_entries_timers: Map.new,   # one timer for each follower
@@ -32,7 +32,6 @@ def initialise(config, server_num, servers, databaseP) do
     leaderP:        nil,	            # included in reply to client request
 
     # _______________raft paper state variables___________________
-
     curr_term:	  0,                  # current term incremented when starting election
     log:          Log.new(),          # log of entries, indexed from 1
     role:         :FOLLOWER,          # one of :FOLLOWER, :LEADER, :CANDIDATE

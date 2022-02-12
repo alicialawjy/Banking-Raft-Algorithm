@@ -8,6 +8,7 @@ defmodule Timer do
 
 # _________________________________________________________ restart_vote_timer()
 def restart_election_timer(s) do
+  IO.puts("Election timer restarted for Server #{s.server_num}")
   s = Timer.cancel_election_timer(s)
 
   election_timeout = Enum.random(s.config.election_timeout_range)
@@ -39,7 +40,9 @@ def restart_append_entries_timer(s, followerP) do
     { :APPEND_ENTRIES_TIMEOUT, s.curr_term, followerP },
     s.config.append_entries_timeout
   )
+  # IO.inspect(s, label: "before updating state append entries timer")
   s |> State.append_entries_timer(followerP, append_entries_timer)
+  # IO.inspect(s, label: "after updating state append entries timer")
   s |> Debug.message("+atim", {{ :APPEND_ENTRIES_TIMEOUT, s.curr_term, followerP }, s.config.append_entries_timeout})
 end # restart_append_entries_timer
 

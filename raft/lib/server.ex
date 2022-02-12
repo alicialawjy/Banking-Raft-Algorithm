@@ -11,12 +11,13 @@ def start(config, server_num) do
   config = config
     |> Configuration.node_info("Server", server_num)
     |> Debug.node_starting()
-  IO.puts "server starts"
+  IO.puts "server #{server_num} starts"
 
   receive do
   { :BIND, servers, databaseP } ->
-    State.initialise(config, server_num, servers, databaseP) # server_num: own number, servers: all the servers, databaseP: the system db
-      |> Timer.restart_election_timer()
+    s = State.initialise(config, server_num, servers, databaseP) # server_num: own number, servers: all the servers, databaseP: the system db
+    # IO.inspect(s, label: "server in start ")
+    s |> Timer.restart_election_timer()
       |> Server.next()
   end # receive
 end # start
@@ -24,21 +25,45 @@ end # start
 # _________________________________________________________ next()
 def next(s) do
   # s = s |> Server.execute_committed_entries()
-
+  # IO.inspect(s, label: "server in next")
   curr_term = s.curr_term                          # used to discard old messages
   curr_election = s.curr_election                  # used to discard old election timeouts
 
   s = receive do
 
+  # ---------------- VOTE-RELATED MESSAGES ------------------
+  { :ELECTION_TIMEOUT, mterm, melection } = msg when melection < curr_election ->
+    # IO.puts("Election Timeout for Server #{s.server_num}")
+    s |> Debug.received("Old Election Timeout #{inspect msg}")
+
+  { :ELECTION_TIMEOUT, mterm, melection } = msg ->              # Self {Follower, Candidate} >> Self
+    # IO.puts("Election Timeout for Server #{s.server_num}")
+    IO.puts("Server #{s.server_num}, #{mterm}, #{melection} ")
+    s |> Debug.received("-etim", msg)
+      |> Vote.receive_election_timeout()
+
   # ________________________________________________________
+  { :VOTE_REQUEST, candidate } = msg ->                         # From: Candidate >> To: All
+    # IO.puts("Vote Request for Server #{s.server_num}")
+    s |> Debug.message("-vreq", msg)
+      |> Vote.receive_vote_request_from_candidate(candidate)
+
+  # ________________________________________________________
+  { :VOTE_REPLY, follower } = msg ->                            # From: Follower >> To: Candidate
+    # if m.election < curr_election do
+    #   s |> Debug.received("Discard Reply to old Vote Request #{inspect msg}")
+    # else
+      # IO.puts("Vote Reply for Server #{s.server_num}")
+    s
+    |> Debug.message("-vrep", msg)
+    |> Vote.receive_vote_reply_from_follower(follower)
+    # end # if
+
+
+  # ---------------- APPEND-ENTRIES MESSAGES ------------------
   { :APPEND_ENTRIES_REQUEST, mterm, m } when mterm < curr_term -> # Reject send Success=false and newer term in reply
     s |> Debug.message("-areq", "stale #{mterm} #{inspect m}")
       |> AppendEntries.send_entries_reply_to_leader(m.leaderP, false)
-
-  # ________________________________________________________
-  { :VOTE_REQUEST, mterm, m } when mterm < curr_term ->     # Reject, send voted Granted=false and newer_term in reply
-    s |> Debug.message("-vreq", "stale #{mterm} #{inspect m}")
-      |> Vote.send_vote_reply_to_candidate(m.candidateP, false)
 
   # ________________________________________________________
   { _mtype, mterm, _m } = msg when mterm < curr_term ->     # Discard any other stale messages
@@ -53,30 +78,11 @@ def next(s) do
     s |> Debug.message("-arep", msg)
       |> AppendEntries.receive_append_entries_reply_from_follower(mterm, m)
 
+  # ________________________________________________________
+
   { :APPEND_ENTRIES_TIMEOUT, _mterm, followerP } = msg ->   # Leader >> Leader
     s |> Debug.message("-atim", msg)
       |> AppendEntries.receive_append_entries_timeout(followerP)
-
-  # ________________________________________________________
-  { :VOTE_REQUEST, candidate_term, candidate } = msg ->                      # Candidate >> All
-    s |> Debug.message("-vreq", msg)
-      |> Vote.receive_vote_request_from_candidate(candidate_term, candidate, s)
-
-  { :VOTE_REPLY, mterm, m } = msg ->                        # Follower >> Candidate
-    if m.election < curr_election do
-      s |> Debug.received("Discard Reply to old Vote Request #{inspect msg}")
-    else
-      s |> Debug.message("-vrep", msg)
-        |> Vote.receive_vote_reply_from_follower(mterm, m)
-    end # if
-
-  # ________________________________________________________
-  { :ELECTION_TIMEOUT, _mterm, melection } = msg when melection < curr_election ->
-    s |> Debug.received("Old Election Timeout #{inspect msg}")
-
-  { :ELECTION_TIMEOUT, _mterm, _melection } = msg ->        # Self {Follower, Candidate} >> Self
-    s |> Debug.received("-etim", msg)
-      |> Vote.receive_election_timeout()
 
   # ________________________________________________________
   { :CLIENT_REQUEST, m } = msg ->                           # Client >> Leader
