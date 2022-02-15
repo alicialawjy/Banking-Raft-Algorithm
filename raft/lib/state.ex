@@ -50,7 +50,7 @@ end # initialise
 def leaderP(s, v),        do: Map.put(s, :leaderP, v)
 def election_timer(s, v), do: Map.put(s, :election_timer, v)
 def curr_election(s, v),  do: Map.put(s, :curr_election, v)
-def inc_election(s),      do: Map.put(s, :curr_term, s.curr_election + 1)
+def inc_election(s),      do: Map.put(s, :curr_election, s.curr_election + 1)
 def voted_for(s, v),      do: Map.put(s, :voted_for, v)
 def new_voted_by(s),      do: Map.put(s, :voted_by, MapSet.new)
 def add_to_voted_by(s, v),do: Map.put(s, :voted_by, MapSet.put(s.voted_by, v))
@@ -74,6 +74,7 @@ def next_index(s, i, v),  do: Map.put(s, :next_index, Map.put(s.next_index, i, v
 def match_index(s, v),    do: Map.put(s, :match_index, v)
 def match_index(s, i, v), do: Map.put(s, :match_index, Map.put(s.match_index, i, v))
 
+def get_info(s), do: [s.curr_term, s.server_num, s.selfP]
 
 def init_next_index(s) do
   v = Log.last_index(s)+1
