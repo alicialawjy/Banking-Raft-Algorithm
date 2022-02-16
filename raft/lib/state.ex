@@ -75,7 +75,8 @@ def match_index(s, v),    do: Map.put(s, :match_index, v)
 def match_index(s, i, v), do: Map.put(s, :match_index, Map.put(s.match_index, i, v))
 
 def get_info(s), do: [s.curr_term, s.server_num, s.selfP]
-
+def get_append_entries_timer(s, v), do: s.append_entries_timers[v] # returns a timer
+def add_append_entries_timer(s,v), do: Map.put(s, :append_entries_timers, v)
 def init_next_index(s) do
   v = Log.last_index(s)+1
   new_next_index = for server <- s.servers, into: Map.new do

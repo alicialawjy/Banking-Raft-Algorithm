@@ -57,7 +57,7 @@ def next(c) do
 
     c = c
       |> Client.request({ :CLIENT_REQUEST, %{clientP: c.clientP, cid: cid, cmd: cmd } })
-      |> Client.send_client_request_receive_reply(cid)   
+      |> Client.send_client_request_receive_reply(cid)
 
     Client.next(c)
   end # receive
@@ -73,7 +73,7 @@ end # send_client_request_receive_reply
 def send_client_request_to_leader(c) do
   c = if c.leaderP do c else  # round-robin leader selection
     [server | rest] = c.servers
-    c = c |> Client.leaderP(server) 
+    c = c |> Client.leaderP(server)
           |> Client.servers(rest ++ [server])
     c
   end # if
@@ -86,14 +86,14 @@ def receive_reply_from_leader(c, cid) do
   receive do
   { :CLIENT_REPLY, m_cid, :NOT_LEADER, leaderP } when m_cid == cid ->
     Process.sleep(200)
-    c |> Client.leaderP(leaderP)     
+    c |> Client.leaderP(leaderP)
       |> Client.send_client_request_receive_reply(cid)
 
   { :CLIENT_REPLY, m_cid, reply, leaderP } when m_cid == cid ->
     c |> Client.result(reply)
-      |> Client.leaderP(leaderP)     
+      |> Client.leaderP(leaderP)
 
-  { :CLIENT_REPLY, m_cid, _reply, _leaderP } when m_cid < cid -> 
+  { :CLIENT_REPLY, m_cid, _reply, _leaderP } when m_cid < cid ->
     c |> Client.receive_reply_from_leader(cid)
 
   { :CLIENT_TIMELIMIT } ->
@@ -103,7 +103,7 @@ def receive_reply_from_leader(c, cid) do
     Helper.node_halt("***************** Client: unexpected message #{inspect unexpected}")
 
   after c.config.client_reply_timeout ->
-       
+
     # leader probably crashed, retry with next server
     c |> Client.leaderP(nil)
       |> Client.send_client_request_receive_reply(cid)
@@ -111,4 +111,3 @@ def receive_reply_from_leader(c, cid) do
 end # receive_reply
 
 end # Client
-

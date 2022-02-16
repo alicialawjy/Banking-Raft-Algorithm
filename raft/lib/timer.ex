@@ -41,12 +41,21 @@ def restart_append_entries_timer(s, followerP) do
     { :APPEND_ENTRIES_TIMEOUT, s.curr_term, followerP },
     s.config.append_entries_timeout
   )
-  # IO.inspect(s, label: "before updating state append entries timer")
-  s = s |> State.append_entries_timer(followerP, append_entries_timer)
-  # IO.inspect(s, label: "after updating state append entries timer")
-  # s |> Debug.message("+atim", {{ :APPEND_ENTRIES_TIMEOUT, s.curr_term, followerP }, s.config.append_entries_timeout})
-  s
+  s |> State.append_entries_timer(followerP, append_entries_timer)
+  s |> Debug.message("+atim", {{ :APPEND_ENTRIES_TIMEOUT, s.curr_term, followerP }, s.config.append_entries_timeout})
 end # restart_append_entries_timer
+
+def leader_create_aeTimer(s, followerP) do
+  s = Timer.cancel_append_entries_timer(s, followerP)
+
+  append_entries_timer = Process.send_after(
+    s.selfP,
+    { :APPEND_ENTRIES_TIMEOUT, s.curr_term, followerP },
+    s.config.append_entries_timeout
+  )
+
+  append_entries_timer
+end
 
 # _________________________________________________________ cancel_append_entries_timer()
 def cancel_append_entries_timer(s, followerP) do
