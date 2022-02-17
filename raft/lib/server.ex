@@ -108,8 +108,8 @@ def next(s) do
     IO.puts("Received heartbeat from leader, restarting timer")
     s = Timer.restart_election_timer(s)
 
-  { :APPEND_ENTRIES_REQUEST, request, prevIndex, prevTerm, leaderTerm, commitIndex} ->
-    s = AppendEntries.receive_append_entries_request(s, request, prevIndex, prevTerm, leaderTerm, commitIndex)
+  { :APPEND_ENTRIES_REQUEST, leaderTerm, prevIndex, prevTerm, leaderEntries, commitIndex} ->
+    s = AppendEntries.receive_append_entries_request(s, leaderTerm, prevIndex, prevTerm, leaderEntries, commitIndex)
 
   # { :APPEND_ENTRIES_REQUEST, client_msg, leader_term } ->
   #   s = AppendEntries.receive_append_entries_request(s, client_msg, leader_term)
@@ -125,22 +125,27 @@ def next(s) do
 
   # ________________________________________________________
   # If follower term larger than mine, stepdown:
-  {:APPEND_ENTRIES_REPLY, followerP, followerTerm, success, followerLastIndex} when followerTerm > curr_term->
-    IO.puts('Leader #{s.server_num} stepdown as received aeReply from follower with larger term')
-    s = Vote.stepdown(s)
+  # {:APPEND_ENTRIES_REPLY, followerP, followerTerm, success, followerLastIndex} when followerTerm > curr_term->
+  #   IO.puts('Leader #{s.server_num} stepdown as received aeReply from follower with larger term')
+  #   s = Vote.stepdown(s)
 
   # elseif leader with followerTerm==curr_term:
   {:APPEND_ENTRIES_REPLY, followerP, followerTerm, success, followerLastIndex} when s.role == :LEADER ->
     IO.puts('Leader #{s.server_num} received aeReply')
-    s = s |> AppendEntries.receive_append_entries_reply_from_follower(followerP, followerTerm, success, followerLastIndex)
+    s = if followerTerm > curr_term do
+      s = Vote.stepdown(s)
+    else
+      s = AppendEntries.receive_append_entries_reply_from_follower(s, followerP, followerTerm, success, followerLastIndex)
+    end
 
-  # otherwise: ignore
+  # If stepped down, ignore:
   {:APPEND_ENTRIES_REPLY, followerP, followerTerm, success, followerLastIndex} ->
-    IO.puts('Server #{s.server_num} ignored aeReply')
-
+    IO.puts('Server #{s.server_num} ignored aeReply as no longer leader')
+    s
 #   { :APPEND_ENTRIES_REPLY, mterm, m } = msg ->              # Follower >> Leader
 #     s |> Debug.message("-arep", msg)
 #       |> AppendEntries.receive_append_entries_reply_from_follower(mterm, m)
+
 
   # ________________________________________________________
 
@@ -148,7 +153,7 @@ def next(s) do
     s = s
       |> Debug.message("-atim", msg)
       |> Timer.restart_append_entries_timer(followerP)
-    AppendEntries.receive_append_entries_timeout(followerP)
+    AppendEntries.receive_append_entries_timeout(s, followerP)
 
     s
 

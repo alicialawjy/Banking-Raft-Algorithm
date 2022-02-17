@@ -9,10 +9,13 @@ defmodule ClientReq do
 # Leader process client request, send entries to all followers
 def receive_request_from_client(leader, m) do
   #
-  leader = Log.append_entry(leader, {:request, m, :term, leader.curr_term})
+  leader = leader
+    |> Log.append_entry(leader, {:request, m, :term, leader.curr_term})   # append the new client request
+    |> State.commit_index(Log.last_index(leader))                         # update the commit index for in the logs
+
   for n <- leader.servers do
     if n != leader.selfP do
-      send n, { :APPEND_ENTRIES_REQUEST, Log.get_entries(Log.last_index(leader), Log.last_index(leader)), Log.last_index(leader)-1, term_at(leader, Log.last_index(leader)-1), leader.curr_term, leader.commit_index}
+      send n, { :APPEND_ENTRIES_REQUEST, Log.get_entries(Log.last_index(leader), Log.last_index(leader)), Log.last_index(leader)-1, Log.term_at(leader, Log.last_index(leader)-1), leader.curr_term, leader.commit_index}
 
       # AppendEntries.send_entries_to_followers(leader, n, m)
   end
