@@ -46,7 +46,7 @@ def next(s) do
       |> Debug.received("-etim", msg)
       |> Vote.receive_election_timeout()
 
-    IO.inspect(s, label: "s after election timeout finished - in server.ex")
+    # IO.inspect(s, label: "s after election timeout finished - in server.ex")
     s
   # ________________________________________________________
   # (ii) When follower received vote request from candidate
@@ -61,7 +61,7 @@ def next(s) do
       |> Debug.message("-vreq", msg)
       |> Vote.receive_vote_request_from_candidate(candidate_curr_term, candidate_num, candidate_id)
 
-    IO.inspect(s, label: "s #{s.server_num} after receive_vote_request_from_candidate #{candidate_num} finished - in server.ex")
+    # IO.inspect(s, label: "s #{s.server_num} after receive_vote_request_from_candidate #{candidate_num} finished - in server.ex")
     s
   # ________________________________________________________
   # (iii) When candidate received a vote reply from a follower
@@ -85,7 +85,7 @@ def next(s) do
     # Debug.received("Discard Reply to old Vote Request #{inspect msg}")
     s
 
-    IO.inspect(s, label: "s after receive_vote_reply_from_follower finished - in server.ex")
+    # IO.inspect(s, label: "s after receive_vote_reply_from_follower finished - in server.ex")
     s
 
     # ________________________________________________________
@@ -94,22 +94,27 @@ def next(s) do
     #   IO.puts("leader message received")
     #   Process.exit(s.selfP, :kill)
 
-    {:LEADER_ELECTED, _candidate_num, candidate_curr_term} when candidate_curr_term < curr_term ->
+    {:LEADER_ELECTED, _leaderP, leader_curr_term} when leader_curr_term < curr_term ->
       IO.puts("Old leader message. Discard message.")
       s
 
-    {:LEADER_ELECTED, candidate_num, candidate_curr_term} -> # when candidate_curr_term == curr_term
-      s = s |> Vote.receive_leader(candidate_num, candidate_curr_term)
+    {:LEADER_ELECTED, leaderP, leader_curr_term} -> # when candidate_curr_term == curr_term
+      s = s |> Vote.receive_leader(leaderP, leader_curr_term)
       s
+
+
+
   # ---------------- APPEND-ENTRIES MESSAGES ------------------
   # If receive heartbeat, aka an empty append entries request
   # From: Leader --> To: Candidate
   { :APPEND_ENTRIES_REQUEST, leaderTerm, commitIndex } ->
-    IO.puts("Received heartbeat from leader, restarting timer")
-    s = s |> Timer.restart_election_timer(s)
+    # IO.puts("Received heartbeat, Server #{s.server_num} restarting timer - Line 111 server.ex")
+    s = s |> Timer.restart_election_timer()
     s
 
   { :APPEND_ENTRIES_REQUEST, leaderTerm, prevIndex, prevTerm, leaderEntries, commitIndex} ->
+    IO.puts("Received aeReq from leader, processing - Line 116 server.ex")
+    # IO.inspect(s, label: "server.ex Line 117")
     s = AppendEntries.receive_append_entries_request(s, leaderTerm, prevIndex, prevTerm, leaderEntries, commitIndex)
     s
 
@@ -126,23 +131,21 @@ def next(s) do
 #     s |> Debug.received("stale #{inspect msg}")
 
   # ________________________________________________________
-  # If follower term larger than mine, stepdown:
-  # {:APPEND_ENTRIES_REPLY, followerP, followerTerm, success, followerLastIndex} when followerTerm > curr_term->
-  #   IO.puts('Leader #{s.server_num} stepdown as received aeReply from follower with larger term')
-  #   s = Vote.stepdown(s)
-
-  # elseif leader with followerTerm==curr_term:
+  # If leader
   {:APPEND_ENTRIES_REPLY, followerP, followerTerm, success, followerLastIndex} when s.role == :LEADER ->
     IO.puts('Leader #{s.server_num} received aeReply')
+    # If follower term larger than mine, stepdown:
     s = if followerTerm > curr_term do
-      s = Vote.stepdown(s)
+      IO.puts("Leader term #{s.curr_term} smaller than follower term #{followerTerm}, stepdown")
+      s = Vote.stepdown(s, followerTerm)
     else
+      IO.puts("Leader #{s.server_num} processing aeReply")
       s = AppendEntries.receive_append_entries_reply_from_follower(s, followerP, followerTerm, success, followerLastIndex)
     end
 
-  # If stepped down, ignore:
+  # If not leader, ignore:
   {:APPEND_ENTRIES_REPLY, followerP, followerTerm, success, followerLastIndex} ->
-    IO.puts('Server #{s.server_num} ignored aeReply as no longer leader')
+    IO.puts("Server #{s.server_num} ignored aeReply as no longer leader")
     s
 #   { :APPEND_ENTRIES_REPLY, mterm, m } = msg ->              # Follower >> Leader
 #     s |> Debug.message("-arep", msg)
@@ -150,26 +153,26 @@ def next(s) do
 
 
   # ________________________________________________________
-
-  { :APPEND_ENTRIES_TIMEOUT, term, followerP } = msg when term == curr_term ->   # Leader >> Leader
-    s = s
+  { :APPEND_ENTRIES_TIMEOUT, term, followerP } = msg ->   # Leader >> Leader
+    s = if s.role == :LEADER && term == curr_term do
+      # IO.puts("Leader received aeTimeout")
+      s = s
       |> Debug.message("-atim", msg)
-      |> Timer.restart_append_entries_timer(followerP)
-    AppendEntries.receive_append_entries_timeout(s, followerP)
+      |> AppendEntries.send_entries_to_followers(followerP)
+    else
+      IO.puts("Server received outdated aeTimeout (either not leader/ from older term")
+      s
+    end
 
     s
 
-  # { :APPEND_ENTRIES_TIMEOUT, term, followerP } = msg when term == curr_term ->   # Leader >> Leader
-  #   s = s
-  #     |> Debug.message("-atim", msg)
-  #     |> Timer.restart_append_entries_timer(followerP)
-  #     |> AppendEntries.receive_append_entries_timeout(followerP)
-  #   s
-
   # ________________________________________________________
-  { :CLIENT_REQUEST, m } = msg when s.role == :LEADER ->                           # Client >> Leader
+  { :CLIENT_REQUEST, m } = msg when s.role == :LEADER ->     # Client >> Leader
     s |> Debug.message("-creq", msg)
       |> ClientReq.receive_request_from_client(m)
+
+  { :CLIENT_REQUEST, m } = msg ->                             # Client >> Follower/Candidate (IGNORE)
+    s
 
 #   # { :DB_RESULT, _result } when false -> # don't process DB_RESULT here
 

@@ -10,7 +10,7 @@ defmodule ClientReq do
 def receive_request_from_client(leader, m) do
   #
   leader = leader
-    |> Log.append_entry(leader, {:request, m, :term, leader.curr_term})   # append the new client request
+    |> Log.append_entry(%{request: m, term: leader.curr_term})   # append the new client request
     |> State.commit_index(Log.last_index(leader))                         # update the commit index for in the logs
 
   for n <- leader.servers do
@@ -21,10 +21,12 @@ def receive_request_from_client(leader, m) do
       # leader = leader |> State.last_log_index(lastLogIndex)
       #                 |> State.next_index(n, lastLogIndex)
       # send n, { :APPEND_ENTRIES_REQUEST, Log.get_entries(lastLogIndex, State.get_log_length(leader)), lastLogIndex-1, Log.term_at(leader, lastLogIndex-1), leader.curr_term, leader.commit_index}
-    end
-    leader
-  end
-  IO.inspect(leader, label: "leader after receive_request_from_client")
+      leader
+    else
+      leader
+    end # if
+  end # for
+  IO.inspect(leader.log, label: "Received request from client. Leader log: ")
   leader
 end
 

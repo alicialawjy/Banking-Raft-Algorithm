@@ -20,7 +20,7 @@ def restart_election_timer(s) do
 
   s = s |> State.election_timer(election_timer)
   # |> Debug.message("+etim", {{:ELECTION_TIMEOUT, s.curr_term, s.curr_election }, election_timeout})
-  IO.puts("Election timer restart for Server #{s.server_num} complete")
+  # IO.puts("Election timer restart for Server #{s.server_num} complete")
   s
 end # restart_election_timer
 

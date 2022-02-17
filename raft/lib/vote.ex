@@ -25,7 +25,6 @@ def receive_election_timeout(s) do
   for n <- s.servers do
     if n != s.selfP do
       send n, { :VOTE_REQUEST, State.get_info(s) }
-      # Timer.restart_append_entries_timer(s,n)
     end
   end
 
@@ -46,7 +45,7 @@ def receive_vote_request_from_candidate(follower, candidate_curr_term, candidate
   end
 
   # Check if stepdown implemented correctly
-  IO.inspect(follower, label: "s after stepdown function")
+  # IO.inspect(follower, label: "follower after stepdown function")
 
   # If candidate term == follower term and follower has not voted
   follower = if ((candidate_curr_term == follower.curr_term) && (follower.voted_for == nil)) do
@@ -63,7 +62,7 @@ def receive_vote_request_from_candidate(follower, candidate_curr_term, candidate
     send candidate_id, {:VOTE_REPLY, follower.server_num, follower.curr_term}
     # Check if follower state correctly reflects vote
     IO.puts("Server #{follower.server_num} voted for Server #{candidate_num}")
-    IO.inspect(follower, label: "After voting")
+    # IO.inspect(follower, label: "After voting")
   end
 
   follower # return
@@ -91,7 +90,7 @@ def receive_vote_reply_from_follower(candidate, follower_num, follower_curr_term
     candidate
   end
   IO.puts("Processed vote from Server #{follower_num} for Server #{candidate.server_num}")
-  IO.inspect(candidate, label: "added new voter")
+  # IO.inspect(candidate, label: "added new voter")
 
   # Check if majority. If yes, become leader
   candidate = if State.vote_tally(candidate) >= candidate.majority do
@@ -109,9 +108,12 @@ defp become_leader(candidate) do
   candidate = candidate
     |> State.role(:LEADER)                          # Update role to leader
     |> Timer.cancel_election_timer()                # Remove leader's election timer (not needed)
-    |> State.next_index(Log.last_index(candidate))  # Update it's next index with all of its followers to its log length
+    |> State.init_next_index()  # Update it's next index with all of its followers to its log length
+
+  # IO.inspect(candidate, label: "after init next index - Line 114 vote.ex")
 
   # Build the append entries timer for its followers
+
   aeTimer =
     for i <- candidate.servers,
     into: Map.new
@@ -125,34 +127,34 @@ defp become_leader(candidate) do
 
   # Append timer to leader
   candidate = State.add_append_entries_timer(candidate, aeTimer)
-  IO.inspect(candidate, label: "leader after added aeTimer")
+  # IO.inspect(candidate, label: "leader after added aeTimer")
 
   # Send messages to followers to announce leadership
   for n <- candidate.servers do
     if n != candidate.selfP do
-      send n, {:LEADER_ELECTED, candidate.server_num, candidate.curr_term} # Inform others that server is now the leader for the term
-      send n, {:APPEND_ENTRIES_REQ, candidate.curr_term, candidate.commit_index } # TESTING: send empty append entries req, aka a heartbeat
+      send n, {:LEADER_ELECTED, candidate.selfP, candidate.curr_term} # Inform others that server is now the leader for the term
+      send n, {:APPEND_ENTRIES_REQUEST, candidate.curr_term, candidate.commit_index } # TESTING: send empty append entries req, aka a heartbeat
       # AppendEntries.send_entries_to_followers(candidate, n, nil)
     end #if
   end #for
 
-  IO.inspect(candidate, label: "leader after sending messages")
+  # IO.inspect(candidate, label: "leader after sending messages")
 
   candidate
 end
 
-def receive_leader(follower, candidate_num, candidate_curr_term) do
-  # If follower term is < ledaer term, update follower's curr_term
-  follower = if follower.curr_term < candidate_curr_term do
-    State.curr_term(follower, candidate_curr_term)
+def receive_leader(follower, leaderP, leader_curr_term) do
+  # If follower term is < leader term, update follower's curr_term
+  follower = if follower.curr_term < leader_curr_term do
+    State.curr_term(follower, leader_curr_term)
   else
     follower
   end
 
   # Update follower's leaderP
   follower = follower
-    |> State.leaderP(candidate_num)
-    |> Timer.restart_election_timer()
+    |> stepdown(leader_curr_term)
+    |> State.leaderP(leaderP)
 
   follower
 end
@@ -160,7 +162,7 @@ end
 def stepdown(server, term) do
   # Used when received message from another server of a larger term.
 
-  # IO.puts("Server #{server.server_num} stepdown")
+  IO.puts("Server #{server.server_num} stepdown")
   server = server
     |>State.curr_term(term)                   # update to latest term
     |>State.role(:FOLLOWER)                   # make sure become follower
