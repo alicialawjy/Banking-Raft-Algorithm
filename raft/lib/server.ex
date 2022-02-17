@@ -106,10 +106,12 @@ def next(s) do
   # From: Leader --> To: Candidate
   { :APPEND_ENTRIES_REQUEST, leaderTerm, commitIndex } ->
     IO.puts("Received heartbeat from leader, restarting timer")
-    s = Timer.restart_election_timer(s)
+    s = s |> Timer.restart_election_timer(s)
+    s
 
   { :APPEND_ENTRIES_REQUEST, leaderTerm, prevIndex, prevTerm, leaderEntries, commitIndex} ->
     s = AppendEntries.receive_append_entries_request(s, leaderTerm, prevIndex, prevTerm, leaderEntries, commitIndex)
+    s
 
   # { :APPEND_ENTRIES_REQUEST, client_msg, leader_term } ->
   #   s = AppendEntries.receive_append_entries_request(s, client_msg, leader_term)
@@ -156,6 +158,13 @@ def next(s) do
     AppendEntries.receive_append_entries_timeout(s, followerP)
 
     s
+
+  # { :APPEND_ENTRIES_TIMEOUT, term, followerP } = msg when term == curr_term ->   # Leader >> Leader
+  #   s = s
+  #     |> Debug.message("-atim", msg)
+  #     |> Timer.restart_append_entries_timer(followerP)
+  #     |> AppendEntries.receive_append_entries_timeout(followerP)
+  #   s
 
   # ________________________________________________________
   { :CLIENT_REQUEST, m } = msg when s.role == :LEADER ->                           # Client >> Leader

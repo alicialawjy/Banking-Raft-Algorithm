@@ -40,6 +40,9 @@ def initialise(config, server_num, servers, databaseP) do
 
     next_index:   Map.new,            # foreach follower, index of follower's last known entry+1
     match_index:  Map.new,            # index of highest entry known to be replicated at a follower
+
+    last_log_index: nil,              # index of last log
+
   }
 end # initialise
 
@@ -77,6 +80,11 @@ def match_index(s, i, v), do: Map.put(s, :match_index, Map.put(s.match_index, i,
 def get_info(s), do: [s.curr_term, s.server_num, s.selfP]
 def get_append_entries_timer(s, v), do: s.append_entries_timers[v] # returns a timer
 def add_append_entries_timer(s,v), do: Map.put(s, :append_entries_timers, v)
+
+def last_log_index(s, index), do: Map.put(s, :last_log_index, index)
+def get_next_index(s, pid), do: Map.get(s.next_index, pid, 1)
+def get_match_index(s, pid), do: Map.get(s.match_index, pid, 0)
+
 def init_next_index(s) do
   v = Log.last_index(s)+1
   new_next_index = for server <- s.servers, into: Map.new do

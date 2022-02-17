@@ -107,8 +107,9 @@ end
 defp become_leader(candidate) do
   # Change candidate status to leader
   candidate = candidate
-    |> State.role(:LEADER)
-    |> Timer.cancel_election_timer()
+    |> State.role(:LEADER)                          # Update role to leader
+    |> Timer.cancel_election_timer()                # Remove leader's election timer (not needed)
+    |> State.next_index(Log.last_index(candidate))  # Update it's next index with all of its followers to its log length
 
   # Build the append entries timer for its followers
   aeTimer =
