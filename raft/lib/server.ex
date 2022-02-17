@@ -106,10 +106,12 @@ def next(s) do
   # From: Leader --> To: Candidate
   { :APPEND_ENTRIES_REQUEST, leaderTerm, commitIndex } ->
     IO.puts("Received heartbeat from leader, restarting timer")
-    s = Timer.restart_election_timer(s)
+    s = s |> Timer.restart_election_timer(s)
+    s
 
   { :APPEND_ENTRIES_REQUEST, request, prevIndex, prevTerm, leaderTerm, commitIndex} ->
-    s = AppendEntries.receive_append_entries_request(s, request, prevIndex, prevTerm, leaderTerm, commitIndex)
+    s = s |> AppendEntries.receive_append_entries_request(s, request, prevIndex, prevTerm, leaderTerm, commitIndex)
+    s
 
   # { :APPEND_ENTRIES_REQUEST, client_msg, leader_term } ->
   #   s = AppendEntries.receive_append_entries_request(s, client_msg, leader_term)
@@ -144,13 +146,18 @@ def next(s) do
 
   # ________________________________________________________
 
-  { :APPEND_ENTRIES_TIMEOUT, term, followerP } = msg when term == curr_term ->   # Leader >> Leader
-    s = s
-      |> Debug.message("-atim", msg)
-      |> Timer.restart_append_entries_timer(followerP)
-    AppendEntries.receive_append_entries_timeout(followerP)
+  { :APPEND_ENTRIES_TIMEOUT, term, followerP } = msg when s.role == :LEADER ->   # Leader >> Leader
+  s = s
+    |> Debug.message("-atim", msg)
+    |> AppendEntries.receive_append_entries_timeout(followerP)
+  s
 
-    s
+  # { :APPEND_ENTRIES_TIMEOUT, term, followerP } = msg when term == curr_term ->   # Leader >> Leader
+  #   s = s
+  #     |> Debug.message("-atim", msg)
+  #     |> Timer.restart_append_entries_timer(followerP)
+  #     |> AppendEntries.receive_append_entries_timeout(followerP)
+  #   s
 
   # ________________________________________________________
   { :CLIENT_REQUEST, m } = msg when s.role == :LEADER ->                           # Client >> Leader
