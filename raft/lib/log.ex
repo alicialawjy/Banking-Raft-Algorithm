@@ -28,29 +28,10 @@ def append_entry(s, entry), do:
 
 def merge_entries(s, entries), do:                # entries should be disjoint
   Log.new(s, Map.merge(s.log, entries))
-  # IO.puts "after merge_entries: #{inspect(s.log)}"
 
 def delete_entries(s, range), do:                 # e.g. delete s.log[3..5] keep rest
   Log.new(s, Map.drop(s.log, Enum.to_list(range)))
 
 def delete_entries_from(s, from), do:             # delete s.log[from..last] keep rest
   Log.delete_entries(s, from .. Log.last_index(s))
-
-
-
-def test_delete_entries_from(s, from) do             # delete s.log[from..last] keep rest
-  IO.puts "before delete_entries: #{inspect(s.log)}"
-  IO.puts "Deleting: from: #{from}, last: #{Log.last_index(s)}"
-  s = s |> Log.new(Map.drop(s.log, Enum.to_list(from .. Log.last_index(s))))
-  IO.puts "after delete_entries: #{inspect(s.log)}"
-  s
-end
-
-def test_merge_entries(s, entries) do                # entries should be disjoint
-  IO.puts "before merge_entries: log:#{inspect(s.log)}, entries:#{inspect(entries)}}"
-  s = s|> Log.new(Map.merge(s.log, entries))
-  IO.puts "after merge_entries: #{inspect(s.log)}"
-  s
-end
-
 end # Log

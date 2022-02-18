@@ -45,7 +45,7 @@ def params :default do
     max_amount:              1_000,    # max amount moved between accounts in a single transaction
 
     client_timelimit:        60_000,   # clients stops sending requests after this time(ms)
-    max_client_requests:     1,        # maximum no of requests each client will attempt
+    max_client_requests:     2,        # maximum no of requests each client will attempt
     client_request_interval: 5,        # interval(ms) between client requests
     client_reply_timeout:    500,      # timeout(ms) for the reply to a client request
 

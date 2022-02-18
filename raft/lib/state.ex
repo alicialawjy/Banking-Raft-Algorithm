@@ -38,11 +38,8 @@ def initialise(config, server_num, servers, databaseP) do
     commit_index: 0,                  # index of highest committed entry in server's log
     last_applied: 0,                  # index of last entry applied to state machine of server
 
-    next_index:   Map.new,            # foreach follower, index of follower's last known entry+1
+    next_index:   Map.new,            # foreach follower, index of follower's last known entry + 1
     match_index:  Map.new,            # index of highest entry known to be replicated at a follower
-
-    last_log_index: nil,              # index of last log
-
   }
 end # initialise
 
@@ -77,11 +74,10 @@ def next_index(s, i, v),  do: Map.put(s, :next_index, Map.put(s.next_index, i, v
 def match_index(s, v),    do: Map.put(s, :match_index, v)
 def match_index(s, i, v), do: Map.put(s, :match_index, Map.put(s.match_index, i, v))
 
-def get_info(s), do: [s.curr_term, s.server_num, s.selfP]
+def get_info(s), do: [s.curr_term, s.server_num, s.selfP, Log.term_at(s, Log.last_index(s)), Log.last_index(s)]
 def get_append_entries_timer(s, v), do: s.append_entries_timers[v] # returns a timer
 def add_append_entries_timer(s,v), do: Map.put(s, :append_entries_timers, v)
 
-def last_log_index(s, index), do: Map.put(s, :last_log_index, index)
 def get_next_index(s, pid), do: Map.get(s.next_index, pid, 1)
 def get_match_index(s, pid), do: Map.get(s.match_index, pid, 0)
 

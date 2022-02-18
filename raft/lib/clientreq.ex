@@ -8,25 +8,34 @@ defmodule ClientReq do
 
 # Leader process client request, send entries to all followers
 def receive_request_from_client(leader, m) do
-  #
-  leader = leader
-    |> Log.append_entry(%{request: m, term: leader.curr_term})   # append the new client request
-    |> State.commit_index(Log.last_index(leader))                         # update the commit index for in the logs
+  # IO.inspect(leader.log, label: "before received request from client. Leader log: ")
+  leader = Log.append_entry(leader, %{request: m, term: leader.curr_term})
+  leader = State.commit_index(leader, Log.last_index(leader))                             # update the commit index for in the logs
+  # IO.inspect(leader.log, label: "line 14 Leader log: ")
 
   for n <- leader.servers do
     if n != leader.selfP do
       AppendEntries.send_entries_to_followers(leader, n)
-
-      # lastLogIndex = min(State.get_next_index(leader, n), State.get_log_length(leader))
-      # leader = leader |> State.last_log_index(lastLogIndex)
-      #                 |> State.next_index(n, lastLogIndex)
-      # send n, { :APPEND_ENTRIES_REQUEST, Log.get_entries(lastLogIndex, State.get_log_length(leader)), lastLogIndex-1, Log.term_at(leader, lastLogIndex-1), leader.curr_term, leader.commit_index}
       leader
     else
       leader
     end # if
   end # for
-  IO.inspect(leader.log, label: "Received request from client. Leader log: ")
+  IO.inspect(leader.log, label: "line 24 Received request from client. Leader log: ")
+  leader
+end
+
+def receive_reply_from_db(leader, db_seqnum, client_request) do
+  leader = leader |> State.last_applied(db_seqnum)
+  # IO.puts "db_seqnum: #{db_seqnum}"
+  # IO.puts "leader last_applied after receive_reply_from_db #{leader.last_applied}"
+  IO.puts "leader send client_request #{inspect(client_request.cid)} #{inspect(client_request)} to client #{}"
+
+  send client_request.clientP, { :CLIENT_REPLY, client_request.cid, client_request, leader.selfP }
+  for followerP <- leader.servers do
+    send followerP, {:COMMIT_ENTRIES_REQUEST, db_seqnum}
+  end
+
   leader
 end
 

@@ -27,7 +27,7 @@ def next(s) do
   # s = s |> Server.execute_committed_entries()
   # IO.inspect(s, label: "At the start of next()")
   curr_term = s.curr_term                          # used to discard old messages
-  curr_election = s.curr_election                  # used to discard old election timeouts
+  # curr_election = s.curr_election                  # used to discard old election timeouts
 
   s = receive do
 
@@ -51,15 +51,15 @@ def next(s) do
   # ________________________________________________________
   # (ii) When follower received vote request from candidate
   # If candidate term is lower, do not vote
-  { :VOTE_REQUEST, [candidate_curr_term, candidate_num, _candidate_id] } when candidate_curr_term < curr_term ->
+  { :VOTE_REQUEST, [candidate_curr_term, candidate_num, _candidate_id, candidateLastLogTerm, candidateLastLogIndex] } when candidate_curr_term < curr_term ->
     IO.puts("Server #{s.server_num} received vote req from Server #{candidate_num} but did not vote")
     s
 
   # If candidate term >= ours, process:
-  { :VOTE_REQUEST, [candidate_curr_term, candidate_num, candidate_id] } = msg ->
+  { :VOTE_REQUEST, [candidate_curr_term, candidate_num, candidate_id, candidateLastLogTerm, candidateLastLogIndex] } = msg ->
     s = s
       |> Debug.message("-vreq", msg)
-      |> Vote.receive_vote_request_from_candidate(candidate_curr_term, candidate_num, candidate_id)
+      |> Vote.receive_vote_request_from_candidate(candidate_curr_term, candidate_num, candidate_id, candidateLastLogTerm, candidateLastLogIndex)
 
     # IO.inspect(s, label: "s #{s.server_num} after receive_vote_request_from_candidate #{candidate_num} finished - in server.ex")
     s
@@ -86,7 +86,7 @@ def next(s) do
     s
 
     # IO.inspect(s, label: "s after receive_vote_reply_from_follower finished - in server.ex")
-    s
+    # s
 
     # ________________________________________________________
     # (iv) When a leader is elected
@@ -118,6 +118,12 @@ def next(s) do
     s = AppendEntries.receive_append_entries_request(s, leaderTerm, prevIndex, prevTerm, leaderEntries, commitIndex)
     s
 
+    # { :APPEND_ENTRIES_REQUEST, leaderTerm, prevIndex, prevTerm, leaderEntries, commitIndex} when s.role == :LEADER->
+    #   IO.puts("Leader received aeReq from leader, processing - Line 122 server.ex")
+    #   # IO.inspect(s, label: "server.ex Line 117")
+    #   s
+
+
   # { :APPEND_ENTRIES_REQUEST, client_msg, leader_term } ->
   #   s = AppendEntries.receive_append_entries_request(s, client_msg, leader_term)
 
@@ -142,6 +148,7 @@ def next(s) do
       IO.puts("Leader #{s.server_num} processing aeReply")
       s = AppendEntries.receive_append_entries_reply_from_follower(s, followerP, followerTerm, success, followerLastIndex)
     end
+    s
 
   # If not leader, ignore:
   {:APPEND_ENTRIES_REPLY, followerP, followerTerm, success, followerLastIndex} ->
@@ -167,14 +174,45 @@ def next(s) do
     s
 
   # ________________________________________________________
-  { :CLIENT_REQUEST, m } = msg when s.role == :LEADER ->     # Client >> Leader
-    s |> Debug.message("-creq", msg)
+  { :CLIENT_REQUEST, m } = msg when s.role == :LEADER ->                  # Client >> Leader
+    s = s
+      |> Debug.message("-creq", msg)
       |> ClientReq.receive_request_from_client(m)
-
-  { :CLIENT_REQUEST, m } = msg ->                             # Client >> Follower/Candidate (IGNORE)
+    # IO.inspect(s.log, label: "Leader logs - server.ex Line 179")
     s
 
-#   # { :DB_RESULT, _result } when false -> # don't process DB_RESULT here
+  { :CLIENT_REQUEST, m } = msg ->                                         # Client >> Follower/Candidate (IGNORE)
+   #  send m.clientP, {:CLIENT_REPLY, m.cid, :NOT_LEADER, s.leaderP}
+    s
+
+  { :DB_REPLY, _result, db_seqnum, client_request } when s.role == :LEADER ->     # DB Replication successful for leader
+    s = ClientReq.receive_reply_from_db(s, db_seqnum, client_request)
+    IO.puts("Database replicated log #{inspect (client_request)}")
+    s
+
+  { :DB_REPLY, _result, db_seqnum, client_request } when s.last_applied < db_seqnum ->   # DB Replication successful for follower/candidate
+    s = State.last_applied(s, db_seqnum)
+    IO.puts("Commit request log #{inspect (client_request)} to local database")
+    s
+
+  { :DB_REPLY, _result, db_seqnum, client_request } -> # catch misordered messages
+    IO.puts("Ignore dbReply for log #{inspect (client_request)}")
+    s
+
+  {:COMMIT_ENTRIES_REQUEST, db_seqnum} when db_seqnum > s.last_applied -> # database send reply to leader, then follower can commit the request to its local machine
+    for index <- (s.last_applied+1)..min(db_seqnum, s.commit_index) do
+      IO.puts("Follower committ log #{index} to database")
+      send s.databaseP, { :DB_REQUEST, Log.request_at(s, index), index}
+    end
+    s
+
+  {:COMMIT_ENTRIES_REQUEST, db_seqnum} -> # follower ignore the request which has lower index than last_applied
+    IO.puts("Follower already committed log #{db_seqnum} to database")
+    s
+
+  # { :DB_RESULT, result, db_seqnum } ->                       # DB Replication unsucessful - did not match db sequence
+  #   IO.puts("Database did not replicate log #{db_seqnum}.")
+  #   s
 
     unexpected ->
       Helper.node_halt("************* Server: unexpected message #{inspect unexpected}")

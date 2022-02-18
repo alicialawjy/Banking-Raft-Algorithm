@@ -14,7 +14,6 @@ def receive_election_timeout(s) do
   s = s
     |> State.role(:CANDIDATE)         # change role to candidate
     |> State.inc_term()               # increment current term
-    |> State.inc_election()           # increment election term (???)
     |> State.voted_for(s.server_num)       # vote for self
     |> State.add_to_voted_by(s.server_num) # add self to list of voters
     |> Timer.restart_election_timer() # restart election timer
@@ -31,7 +30,7 @@ def receive_election_timeout(s) do
   s # return
 end
 
-def receive_vote_request_from_candidate(follower, candidate_curr_term, candidate_num, candidate_id) do
+def receive_vote_request_from_candidate(follower, candidate_curr_term, candidate_num, candidate_id, candidateLastLogTerm, candidateLastLogIndex) do
   # Candidate - has term >= follower term currently and is requesting my vote
   # Follower - me (server)
 
@@ -44,13 +43,12 @@ def receive_vote_request_from_candidate(follower, candidate_curr_term, candidate
     follower
   end
 
-  # Check if stepdown implemented correctly
-  # IO.inspect(follower, label: "follower after stepdown function")
+  # Because of step down, candidate term == follower term here.
+  # If follower has not voted
+  followerLastLogTerm = Log.term_at(follower, Log.last_index(follower))
 
-  # If candidate term == follower term and follower has not voted
-  follower = if ((candidate_curr_term == follower.curr_term) && (follower.voted_for == nil)) do
+  follower = if (follower.voted_for == nil) && ((candidateLastLogTerm > followerLastLogTerm) || (candidateLastLogTerm == followerLastLogTerm && candidateLastLogIndex >= Log.last_index(follower))) do
     follower
-      # |> State.inc_election()                         # keep up-to-date with the election term incase of outdated election timeout msg (???)
       |> State.voted_for(candidate_num)             # vote for candidate
       |> Timer.restart_election_timer()               # restart election timer
   else
