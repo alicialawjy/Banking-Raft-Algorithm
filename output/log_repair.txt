@@ -1,0 +1,980 @@
+'''
+Entries used to simulate log repair:
+
+    s = if s.server_num != 1 do
+      entry = %{1 => %{request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}}, term: 1},
+                2 => %{request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}}, term: 2},
+                3 => %{ request: %{cid: {4, 4},clientP: 0, cmd: {:MOVE, 635, 99, 65}}, term: 3}}
+      Log.merge_entries(s, entry)
+    else
+      entry = %{1 => %{request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}}, term: 1},
+                2 => %{request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}}, term: 2},
+                3 => %{request: %{cid: {5, 5}, clientP: 0, cmd: {:MOVE, 635, 99, 65}}, term: 2},
+                4 => %{request: %{cid: {6, 6}, clientP: 0, cmd: {:MOVE, 635, 99, 65}}, term: 2},
+                5 => %{request: %{cid: {6, 6}, clientP: 0, cmd: {:MOVE, 635, 99, 65}}, term: 2}}
+      Log.merge_entries(s, entry)
+    end # if
+
+Parameters: 
+'''
+
+monitor spawned
+server 1 starts
+server 2 starts
+db spawned
+servers binded
+server 3 starts
+client spawned
+Server 1's logs: %{
+  1 => %{
+    request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 1
+  },
+  2 => %{
+    request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 2
+  },
+  3 => %{
+    request: %{cid: {5, 5}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 2
+  },
+  4 => %{
+    request: %{cid: {6, 6}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 2
+  },
+  5 => %{
+    request: %{cid: {6, 6}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 2
+  }
+}
+
+Server 2's logs: %{
+  1 => %{
+    request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 1
+  },
+  2 => %{
+    request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 2
+  },
+  3 => %{
+    request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 3
+  }
+}
+
+Server 3's logs: %{
+  1 => %{
+    request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 1
+  },
+  2 => %{
+    request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 2
+  },
+  3 => %{
+    request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 3
+  }
+}
+
+Server 1 Election Timeout - START
+Server 1 runs for candidate
+Server 2 Election Timeout - START
+Server 2 runs for candidate
+Server 3 stepdown at receiving vote request
+Server 3 voted for Server 2 in term 2
+Server 2 received Server 3's vote reply. Processing.
+Processed vote from Server 3 for Server 2
+New leader elected! Server 2 is leader for Term 2
+
+New leader's log: %{
+  1 => %{
+    request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 1
+  },
+  2 => %{
+    request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 2
+  },
+  3 => %{
+    request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 3
+  }
+}
+
+Server 1's logs after delete_entries_from: %{
+  1 => %{
+    request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 1
+  },
+  2 => %{
+    request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 2
+  }
+}
+
+Server 3's logs after storeEntries: %{
+  1 => %{
+    request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 1
+  },
+  2 => %{
+    request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 2
+  },
+  3 => %{
+    request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 3
+  },
+  4 => %{
+    request: %{cid: {1, 1}, clientP: #PID<18533.147.0>, cmd: {:MOVE, 388, 7, 3}},
+    term: 2
+  }
+}
+
+Server 1's logs after storeEntries: %{
+  1 => %{
+    request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 1
+  },
+  2 => %{
+    request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 2
+  },
+  3 => %{
+    request: %{cid: {4, 4}, clientP: 0, cmd: {:MOVE, 635, 99, 65}},
+    term: 3
+  },
+  4 => %{
+    request: %{cid: {1, 1}, clientP: #PID<18495.147.0>, cmd: {:MOVE, 388, 7, 3}},
+    term: 2
+  }
+}
+already updated. Server 3's logs stay the same 
+  Node client1_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client6_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client5_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client7_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 14000 client requests seen = [{5, 467}]
+  time = 14000      db updates done = [{1, 466}, {2, 466}, {3, 467}, {4, 467}, {5, 468}, {6, 467}, {7, 467}]
+
+  Node client4_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server10_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client9_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client2_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client8_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client10_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node raft_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 15000 client requests seen = [{5, 467}]
+  time = 15000      db updates done = [{1, 466}, {2, 466}, {3, 467}, {4, 467}, {5, 468}, {6, 467}, {7, 467}]
+
+[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004hcclear[?2004l
+
+[H[2J[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004hmmake cluster[?2004l
+
+mix compile
+-------------------------------------------------------------------
+  time = 1000 client requests seen = [{5, 169}]
+  time = 1000      db updates done = [{1, 169}, {2, 169}, {3, 169}, {4, 169}, {5, 170}, {6, 169}]
+
+  time = 2000 client requests seen = [{5, 224}]
+  time = 2000      db updates done = [{1, 224}, {2, 224}, {3, 224}, {4, 224}, {5, 226}, {6, 224}]
+
+  time = 3000 client requests seen = [{5, 253}]
+  time = 3000      db updates done = [{1, 253}, {2, 253}, {3, 253}, {4, 253}, {5, 255}, {6, 253}]
+
+  time = 4000 client requests seen = [{5, 276}]
+  time = 4000      db updates done = [{1, 276}, {2, 276}, {3, 276}, {4, 276}, {5, 278}, {6, 276}]
+
+  time = 5000 client requests seen = [{5, 306}]
+  time = 5000      db updates done = [{1, 306}, {2, 306}, {3, 306}, {4, 306}, {5, 308}, {6, 306}]
+
+  time = 6000 client requests seen = [{5, 335}]
+  time = 6000      db updates done = [{1, 335}, {2, 335}, {3, 335}, {4, 335}, {5, 338}, {6, 335}]
+
+  time = 7000 client requests seen = [{5, 355}]
+  time = 7000      db updates done = [{1, 355}, {2, 355}, {3, 355}, {4, 355}, {5, 357}, {6, 355}]
+
+  time = 8000 client requests seen = [{5, 380}]
+  time = 8000      db updates done = [{1, 380}, {2, 380}, {3, 380}, {4, 380}, {5, 382}, {6, 380}]
+
+  time = 9000 client requests seen = [{5, 402}]
+  time = 9000      db updates done = [{1, 402}, {2, 402}, {3, 402}, {4, 402}, {5, 404}, {6, 402}]
+
+  time = 10000 client requests seen = [{5, 424}]
+  time = 10000      db updates done = [{1, 424}, {2, 424}, {3, 424}, {4, 424}, {5, 427}, {6, 424}]
+
+  time = 11000 client requests seen = [{5, 439}]
+  time = 11000      db updates done = [{1, 439}, {2, 439}, {3, 439}, {4, 439}, {5, 440}, {6, 439}]
+
+  Node server1_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server2_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 12000 client requests seen = [{5, 453}]
+  time = 12000      db updates done = [{1, 453}, {2, 453}, {3, 453}, {4, 453}, {5, 454}, {6, 453}]
+
+  Node server3_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server4_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server8_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server6_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server9_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 13000 client requests seen = [{5, 461}]
+  time = 13000      db updates done = [{1, 461}, {2, 461}, {3, 461}, {4, 461}, {5, 463}, {6, 461}]
+
+  Node server5_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server7_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client6_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server10_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client1_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client3_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client5_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 14000 client requests seen = [{5, 465}]
+  time = 14000      db updates done = [{1, 461}, {2, 461}, {3, 462}, {4, 463}, {5, 465}, {6, 464}]
+
+  Node client7_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client10_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client2_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client8_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client4_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 15000 client requests seen = [{5, 465}]
+  time = 15000      db updates done = [{1, 461}, {2, 461}, {3, 462}, {4, 463}, {5, 465}, {6, 464}]
+
+  Node raft_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client9_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 16000 client requests seen = [{5, 465}]
+  time = 16000      db updates done = [{1, 461}, {2, 461}, {3, 462}, {4, 463}, {5, 465}, {6, 464}]
+
+[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004hcclear[?2004l
+
+[H[2J[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004hmmake cluster[?2004l
+
+mix compile
+-------------------------------------------------------------------
+  time = 1000 client requests seen = [{4, 145}]
+  time = 1000      db updates done = [{1, 146}, {2, 146}, {3, 146}, {4, 147}, {5, 146}]
+
+  time = 2000 client requests seen = [{4, 230}]
+  time = 2000      db updates done = [{1, 230}, {2, 230}, {3, 230}, {4, 232}, {5, 230}]
+
+  time = 3000 client requests seen = [{4, 287}]
+  time = 3000      db updates done = [{1, 287}, {2, 287}, {3, 287}, {4, 289}, {5, 287}]
+
+  time = 4000 client requests seen = [{4, 325}]
+  time = 4000      db updates done = [{1, 325}, {2, 325}, {3, 325}, {4, 327}, {5, 325}]
+
+  time = 5000 client requests seen = [{4, 364}]
+  time = 5000      db updates done = [{1, 364}, {2, 364}, {3, 364}, {4, 365}, {5, 364}]
+
+  time = 6000 client requests seen = [{4, 395}]
+  time = 6000      db updates done = [{1, 395}, {2, 395}, {3, 395}, {4, 396}, {5, 395}]
+
+  time = 7000 client requests seen = [{4, 424}]
+  time = 7000      db updates done = [{1, 424}, {2, 424}, {3, 424}, {4, 425}, {5, 424}]
+
+  time = 8000 client requests seen = [{4, 447}]
+  time = 8000      db updates done = [{1, 447}, {2, 447}, {3, 447}, {4, 449}, {5, 447}]
+
+  time = 9000 client requests seen = [{4, 472}]
+  time = 9000      db updates done = [{1, 472}, {2, 472}, {3, 472}, {4, 474}, {5, 472}]
+
+  time = 10000 client requests seen = [{4, 496}]
+  time = 10000      db updates done = [{1, 496}, {2, 496}, {3, 496}, {4, 498}, {5, 496}]
+
+  time = 11000 client requests seen = [{4, 516}]
+  time = 11000      db updates done = [{1, 516}, {2, 516}, {3, 516}, {4, 518}, {5, 516}]
+
+  Node server1_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server2_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 12000 client requests seen = [{4, 537}]
+  time = 12000      db updates done = [{1, 537}, {2, 537}, {3, 537}, {4, 538}, {5, 537}]
+
+  Node server3_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server5_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 13000 client requests seen = [{4, 555}]
+  time = 13000      db updates done = [{1, 553}, {2, 555}, {3, 555}, {4, 557}, {5, 555}]
+
+  Node server4_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server10_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client2_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client3_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server9_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client4_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client5_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server8_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client10_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 14000 client requests seen = [{4, 560}]
+  time = 14000      db updates done = [{1, 553}, {2, 555}, {3, 560}, {4, 561}, {5, 560}]
+
+  Node server6_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client1_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client7_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server7_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client8_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node raft_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 15000 client requests seen = [{4, 560}]
+  time = 15000      db updates done = [{1, 553}, {2, 555}, {3, 560}, {4, 561}, {5, 560}]
+
+  Node client6_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client9_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004h                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      m cclear[?2004l
+
+[H[2J[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004hcclear   c  mmake cluster[?2004l
+
+mix compile
+-------------------------------------------------------------------
+[31m
+20:39:11.146 [error] Process #PID<18317.105.0> on node :"client4_03_alicialawjy@127.0.0.1" raised an exception
+** (UndefinedFunctionError) function Client.start/3 is undefined (module Client is not available)
+    (raft 0.1.0) Client.start(%{append_entries_timeout: 10, client_reply_timeout: 10, client_request_interval: 1, client_timelimit: 60000, crash_servers: %{3 => 10000, 4 => 15000}, debug_level: 0, debug_options: "none", election_timeout_range: 100..200, line_num: 0, max_amount: 1000, max_client_requests: 5000, monitorP: #PID<0.144.0>, monitor_interval: 1000, n_accounts: 100, n_clients: 5, n_servers: 7, node_location: "raft_03_alicialawjy@127.0.0.1 (192.168.1.212)", node_name: "Raft", node_num: "", node_suffix: "03_alicialawjy@127.0.0.1", node_type: "Raft", raft_timelimit: 15000, setup: :default, start_function: :cluster_start}, 4, [#PID<18201.147.0>, #PID<18308.146.0>, #PID<18309.147.0>, #PID<18310.147.0>, #PID<18311.147.0>, #PID<18312.147.0>, #PID<18313.147.0>])
+[0m[31m
+20:39:11.146 [error] Process #PID<0.105.0> on node :"client4_03_alicialawjy@127.0.0.1" raised an exception
+** (UndefinedFunctionError) function Client.start/3 is undefined (module Client is not available)
+    Client.start(%{append_entries_timeout: 10, client_reply_timeout: 10, client_request_interval: 1, client_timelimit: 60000, crash_servers: %{3 => 10000, 4 => 15000}, debug_level: 0, debug_options: "none", election_timeout_range: 100..200, line_num: 0, max_amount: 1000, max_client_requests: 5000, monitorP: #PID<15245.144.0>, monitor_interval: 1000, n_accounts: 100, n_clients: 5, n_servers: 7, node_location: "raft_03_alicialawjy@127.0.0.1 (192.168.1.212)", node_name: "Raft", node_num: "", node_suffix: "03_alicialawjy@127.0.0.1", node_type: "Raft", raft_timelimit: 15000, setup: :default, start_function: :cluster_start}, 4, [#PID<15269.147.0>, #PID<15270.146.0>, #PID<15271.147.0>, #PID<15272.147.0>, #PID<15273.147.0>, #PID<15274.147.0>, #PID<15275.147.0>])
+[0m  time = 1000 client requests seen = [{1, 123}]
+  time = 1000      db updates done = [{1, 125}, {2, 123}, {3, 123}, {4, 123}, {5, 123}, {6, 123}, {7, 123}]
+
+  time = 2000 client requests seen = [{1, 183}]
+  time = 2000      db updates done = [{1, 185}, {2, 183}, {3, 183}, {4, 183}, {5, 183}, {6, 183}, {7, 183}]
+
+  time = 3000 client requests seen = [{1, 221}]
+  time = 3000      db updates done = [{1, 222}, {2, 221}, {3, 221}, {4, 221}, {5, 221}, {6, 221}, {7, 221}]
+
+  time = 4000 client requests seen = [{1, 250}]
+  time = 4000      db updates done = [{1, 251}, {2, 250}, {3, 250}, {4, 250}, {5, 250}, {6, 250}, {7, 250}]
+
+  time = 5000 client requests seen = [{1, 279}]
+  time = 5000      db updates done = [{1, 281}, {2, 279}, {3, 279}, {4, 279}, {5, 279}, {6, 279}, {7, 279}]
+
+  time = 6000 client requests seen = [{1, 303}]
+  time = 6000      db updates done = [{1, 305}, {2, 303}, {3, 303}, {4, 303}, {5, 303}, {6, 303}, {7, 303}]
+
+  time = 7000 client requests seen = [{1, 326}]
+  time = 7000      db updates done = [{1, 327}, {2, 326}, {3, 326}, {4, 326}, {5, 326}, {6, 326}, {7, 326}]
+
+  time = 8000 client requests seen = [{1, 344}]
+  time = 8000      db updates done = [{1, 345}, {2, 344}, {3, 344}, {4, 344}, {5, 344}, {6, 344}, {7, 344}]
+
+  time = 9000 client requests seen = [{1, 359}]
+  time = 9000      db updates done = [{1, 361}, {2, 359}, {3, 359}, {4, 359}, {5, 359}, {6, 359}, {7, 359}]
+
+  time = 10000 client requests seen = [{1, 374}]
+  time = 10000      db updates done = [{1, 375}, {2, 374}, {3, 374}, {4, 374}, {5, 374}, {6, 374}, {7, 374}]
+
+  time = 11000 client requests seen = [{1, 392}]
+  time = 11000      db updates done = [{1, 393}, {2, 392}, {3, 392}, {4, 392}, {5, 392}, {6, 392}, {7, 392}]
+
+  time = 12000 client requests seen = [{1, 408}]
+  time = 12000      db updates done = [{1, 409}, {2, 408}, {3, 408}, {4, 408}, {5, 408}, {6, 408}, {7, 408}]
+
+  Node server1_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server4_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server9_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server5_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server2_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server3_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 13000 client requests seen = [{1, 423}]
+  time = 13000      db updates done = [{1, 424}, {2, 423}, {3, 423}, {4, 423}, {5, 423}, {6, 423}, {7, 423}]
+
+  Node server8_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client1_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server7_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client3_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server6_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client6_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 14000 client requests seen = [{1, 427}, {2, 64}]
+  time = 14000      db updates done = [{1, 428}, {2, 492}, {3, 491}, {4, 427}, {5, 480}, {6, 491}, {7, 491}]
+
+  Node client2_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client8_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client5_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client9_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client10_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server10_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node raft_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 15000 client requests seen = [{1, 427}, {2, 64}]
+  time = 15000      db updates done = [{1, 428}, {2, 492}, {3, 491}, {4, 427}, {5, 480}, {6, 491}, {7, 491}]
+
+  Node client7_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client4_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004hcclear[?2004l
+
+[H[2J[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004hmmake cluster[?2004l
+
+mix compile
+-------------------------------------------------------------------
+  time = 1000 client requests seen = [{5, 141}]
+  time = 1000      db updates done = [{1, 141}, {2, 141}, {3, 141}, {4, 141}, {5, 142}, {6, 141}, {7, 141}]
+
+  time = 2000 client requests seen = [{5, 210}]
+  time = 2000      db updates done = [{1, 210}, {2, 210}, {3, 210}, {4, 210}, {5, 212}, {6, 210}, {7, 210}]
+
+  time = 3000 client requests seen = [{5, 253}]
+  time = 3000      db updates done = [{1, 253}, {2, 253}, {3, 253}, {4, 253}, {5, 255}, {6, 253}, {7, 253}]
+
+  time = 4000 client requests seen = [{5, 288}]
+  time = 4000      db updates done = [{1, 288}, {2, 288}, {3, 288}, {4, 288}, {5, 289}, {6, 288}, {7, 288}]
+
+  time = 5000 client requests seen = [{5, 316}]
+  time = 5000      db updates done = [{1, 316}, {2, 316}, {3, 316}, {4, 316}, {5, 318}, {6, 316}, {7, 316}]
+
+  time = 6000 client requests seen = [{5, 343}]
+  time = 6000      db updates done = [{1, 343}, {2, 343}, {3, 343}, {4, 343}, {5, 343}, {6, 343}, {7, 343}]
+
+  time = 7000 client requests seen = [{5, 366}]
+  time = 7000      db updates done = [{1, 366}, {2, 366}, {3, 366}, {4, 366}, {5, 368}, {6, 366}, {7, 366}]
+
+  time = 8000 client requests seen = [{5, 386}]
+  time = 8000      db updates done = [{1, 386}, {2, 386}, {3, 386}, {4, 386}, {5, 387}, {6, 386}, {7, 386}]
+
+  time = 9000 client requests seen = [{5, 406}]
+  time = 9000      db updates done = [{1, 406}, {2, 406}, {3, 406}, {4, 406}, {5, 407}, {6, 406}, {7, 406}]
+
+  time = 10000 client requests seen = [{5, 423}]
+  time = 10000      db updates done = [{1, 423}, {2, 423}, {3, 423}, {4, 423}, {5, 423}, {6, 423}, {7, 423}]
+
+  time = 11000 client requests seen = [{5, 441}]
+  time = 11000      db updates done = [{1, 441}, {2, 441}, {3, 441}, {4, 441}, {5, 442}, {6, 441}, {7, 441}]
+
+  Node server1_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server2_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 12000 client requests seen = [{5, 457}]
+  time = 12000      db updates done = [{1, 457}, {2, 457}, {3, 457}, {4, 457}, {5, 458}, {6, 457}, {7, 457}]
+
+  Node server3_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server4_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server5_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server6_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server7_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server8_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client3_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server9_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 13000 client requests seen = [{5, 467}]
+  time = 13000      db updates done = [{1, 466}, {2, 466}, {3, 467}, {4, 467}, {5, 468}, {6, 467}, {7, 467}]
+
+  Node client1_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client6_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client5_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client7_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 14000 client requests seen = [{5, 467}]
+  time = 14000      db updates done = [{1, 466}, {2, 466}, {3, 467}, {4, 467}, {5, 468}, {6, 467}, {7, 467}]
+
+  Node client4_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server10_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client9_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client2_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client8_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client10_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node raft_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 15000 client requests seen = [{5, 467}]
+  time = 15000      db updates done = [{1, 466}, {2, 466}, {3, 467}, {4, 467}, {5, 468}, {6, 467}, {7, 467}]
+
+[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004hcclear[?2004l
+
+[H[2J[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004hmmake cluster[?2004l
+
+mix compile
+-------------------------------------------------------------------
+  time = 1000 client requests seen = [{5, 169}]
+  time = 1000      db updates done = [{1, 169}, {2, 169}, {3, 169}, {4, 169}, {5, 170}, {6, 169}]
+
+  time = 2000 client requests seen = [{5, 224}]
+  time = 2000      db updates done = [{1, 224}, {2, 224}, {3, 224}, {4, 224}, {5, 226}, {6, 224}]
+
+  time = 3000 client requests seen = [{5, 253}]
+  time = 3000      db updates done = [{1, 253}, {2, 253}, {3, 253}, {4, 253}, {5, 255}, {6, 253}]
+
+  time = 4000 client requests seen = [{5, 276}]
+  time = 4000      db updates done = [{1, 276}, {2, 276}, {3, 276}, {4, 276}, {5, 278}, {6, 276}]
+
+  time = 5000 client requests seen = [{5, 306}]
+  time = 5000      db updates done = [{1, 306}, {2, 306}, {3, 306}, {4, 306}, {5, 308}, {6, 306}]
+
+  time = 6000 client requests seen = [{5, 335}]
+  time = 6000      db updates done = [{1, 335}, {2, 335}, {3, 335}, {4, 335}, {5, 338}, {6, 335}]
+
+  time = 7000 client requests seen = [{5, 355}]
+  time = 7000      db updates done = [{1, 355}, {2, 355}, {3, 355}, {4, 355}, {5, 357}, {6, 355}]
+
+  time = 8000 client requests seen = [{5, 380}]
+  time = 8000      db updates done = [{1, 380}, {2, 380}, {3, 380}, {4, 380}, {5, 382}, {6, 380}]
+
+  time = 9000 client requests seen = [{5, 402}]
+  time = 9000      db updates done = [{1, 402}, {2, 402}, {3, 402}, {4, 402}, {5, 404}, {6, 402}]
+
+  time = 10000 client requests seen = [{5, 424}]
+  time = 10000      db updates done = [{1, 424}, {2, 424}, {3, 424}, {4, 424}, {5, 427}, {6, 424}]
+
+  time = 11000 client requests seen = [{5, 439}]
+  time = 11000      db updates done = [{1, 439}, {2, 439}, {3, 439}, {4, 439}, {5, 440}, {6, 439}]
+
+  Node server1_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server2_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 12000 client requests seen = [{5, 453}]
+  time = 12000      db updates done = [{1, 453}, {2, 453}, {3, 453}, {4, 453}, {5, 454}, {6, 453}]
+
+  Node server3_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server4_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server8_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server6_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server9_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 13000 client requests seen = [{5, 461}]
+  time = 13000      db updates done = [{1, 461}, {2, 461}, {3, 461}, {4, 461}, {5, 463}, {6, 461}]
+
+  Node server5_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server7_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client6_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server10_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client1_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client3_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client5_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 14000 client requests seen = [{5, 465}]
+  time = 14000      db updates done = [{1, 461}, {2, 461}, {3, 462}, {4, 463}, {5, 465}, {6, 464}]
+
+  Node client7_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client10_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client2_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client8_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client4_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 15000 client requests seen = [{5, 465}]
+  time = 15000      db updates done = [{1, 461}, {2, 461}, {3, 462}, {4, 463}, {5, 465}, {6, 464}]
+
+  Node raft_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client9_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 16000 client requests seen = [{5, 465}]
+  time = 16000      db updates done = [{1, 461}, {2, 461}, {3, 462}, {4, 463}, {5, 465}, {6, 464}]
+
+[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004hcclear[?2004l
+
+[H[2J[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004hmmake cluster[?2004l
+
+mix compile
+-------------------------------------------------------------------
+  time = 1000 client requests seen = [{4, 145}]
+  time = 1000      db updates done = [{1, 146}, {2, 146}, {3, 146}, {4, 147}, {5, 146}]
+
+  time = 2000 client requests seen = [{4, 230}]
+  time = 2000      db updates done = [{1, 230}, {2, 230}, {3, 230}, {4, 232}, {5, 230}]
+
+  time = 3000 client requests seen = [{4, 287}]
+  time = 3000      db updates done = [{1, 287}, {2, 287}, {3, 287}, {4, 289}, {5, 287}]
+
+  time = 4000 client requests seen = [{4, 325}]
+  time = 4000      db updates done = [{1, 325}, {2, 325}, {3, 325}, {4, 327}, {5, 325}]
+
+  time = 5000 client requests seen = [{4, 364}]
+  time = 5000      db updates done = [{1, 364}, {2, 364}, {3, 364}, {4, 365}, {5, 364}]
+
+  time = 6000 client requests seen = [{4, 395}]
+  time = 6000      db updates done = [{1, 395}, {2, 395}, {3, 395}, {4, 396}, {5, 395}]
+
+  time = 7000 client requests seen = [{4, 424}]
+  time = 7000      db updates done = [{1, 424}, {2, 424}, {3, 424}, {4, 425}, {5, 424}]
+
+  time = 8000 client requests seen = [{4, 447}]
+  time = 8000      db updates done = [{1, 447}, {2, 447}, {3, 447}, {4, 449}, {5, 447}]
+
+  time = 9000 client requests seen = [{4, 472}]
+  time = 9000      db updates done = [{1, 472}, {2, 472}, {3, 472}, {4, 474}, {5, 472}]
+
+  time = 10000 client requests seen = [{4, 496}]
+  time = 10000      db updates done = [{1, 496}, {2, 496}, {3, 496}, {4, 498}, {5, 496}]
+
+  time = 11000 client requests seen = [{4, 516}]
+  time = 11000      db updates done = [{1, 516}, {2, 516}, {3, 516}, {4, 518}, {5, 516}]
+
+  Node server1_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server2_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 12000 client requests seen = [{4, 537}]
+  time = 12000      db updates done = [{1, 537}, {2, 537}, {3, 537}, {4, 538}, {5, 537}]
+
+  Node server3_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server5_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 13000 client requests seen = [{4, 555}]
+  time = 13000      db updates done = [{1, 553}, {2, 555}, {3, 555}, {4, 557}, {5, 555}]
+
+  Node server4_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server10_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client2_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client3_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server9_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client4_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client5_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server8_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client10_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 14000 client requests seen = [{4, 560}]
+  time = 14000      db updates done = [{1, 553}, {2, 555}, {3, 560}, {4, 561}, {5, 560}]
+
+  Node server6_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client1_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client7_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server7_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client8_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node raft_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 15000 client requests seen = [{4, 560}]
+  time = 15000      db updates done = [{1, 553}, {2, 555}, {3, 560}, {4, 561}, {5, 560}]
+
+  Node client6_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client9_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004h                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                m cclear[?2004l
+
+[H[2J[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004hcclear   c  mmake cluster[?2004l
+
+mix compile
+-------------------------------------------------------------------
+[31m
+20:39:11.146 [error] Process #PID<18317.105.0> on node :"client4_03_alicialawjy@127.0.0.1" raised an exception
+** (UndefinedFunctionError) function Client.start/3 is undefined (module Client is not available)
+    (raft 0.1.0) Client.start(%{append_entries_timeout: 10, client_reply_timeout: 10, client_request_interval: 1, client_timelimit: 60000, crash_servers: %{3 => 10000, 4 => 15000}, debug_level: 0, debug_options: "none", election_timeout_range: 100..200, line_num: 0, max_amount: 1000, max_client_requests: 5000, monitorP: #PID<0.144.0>, monitor_interval: 1000, n_accounts: 100, n_clients: 5, n_servers: 7, node_location: "raft_03_alicialawjy@127.0.0.1 (192.168.1.212)", node_name: "Raft", node_num: "", node_suffix: "03_alicialawjy@127.0.0.1", node_type: "Raft", raft_timelimit: 15000, setup: :default, start_function: :cluster_start}, 4, [#PID<18201.147.0>, #PID<18308.146.0>, #PID<18309.147.0>, #PID<18310.147.0>, #PID<18311.147.0>, #PID<18312.147.0>, #PID<18313.147.0>])
+[0m[31m
+20:39:11.146 [error] Process #PID<0.105.0> on node :"client4_03_alicialawjy@127.0.0.1" raised an exception
+** (UndefinedFunctionError) function Client.start/3 is undefined (module Client is not available)
+    Client.start(%{append_entries_timeout: 10, client_reply_timeout: 10, client_request_interval: 1, client_timelimit: 60000, crash_servers: %{3 => 10000, 4 => 15000}, debug_level: 0, debug_options: "none", election_timeout_range: 100..200, line_num: 0, max_amount: 1000, max_client_requests: 5000, monitorP: #PID<15245.144.0>, monitor_interval: 1000, n_accounts: 100, n_clients: 5, n_servers: 7, node_location: "raft_03_alicialawjy@127.0.0.1 (192.168.1.212)", node_name: "Raft", node_num: "", node_suffix: "03_alicialawjy@127.0.0.1", node_type: "Raft", raft_timelimit: 15000, setup: :default, start_function: :cluster_start}, 4, [#PID<15269.147.0>, #PID<15270.146.0>, #PID<15271.147.0>, #PID<15272.147.0>, #PID<15273.147.0>, #PID<15274.147.0>, #PID<15275.147.0>])
+[0m  time = 1000 client requests seen = [{1, 123}]
+  time = 1000      db updates done = [{1, 125}, {2, 123}, {3, 123}, {4, 123}, {5, 123}, {6, 123}, {7, 123}]
+
+  time = 2000 client requests seen = [{1, 183}]
+  time = 2000      db updates done = [{1, 185}, {2, 183}, {3, 183}, {4, 183}, {5, 183}, {6, 183}, {7, 183}]
+
+  time = 3000 client requests seen = [{1, 221}]
+  time = 3000      db updates done = [{1, 222}, {2, 221}, {3, 221}, {4, 221}, {5, 221}, {6, 221}, {7, 221}]
+
+  time = 4000 client requests seen = [{1, 250}]
+  time = 4000      db updates done = [{1, 251}, {2, 250}, {3, 250}, {4, 250}, {5, 250}, {6, 250}, {7, 250}]
+
+  time = 5000 client requests seen = [{1, 279}]
+  time = 5000      db updates done = [{1, 281}, {2, 279}, {3, 279}, {4, 279}, {5, 279}, {6, 279}, {7, 279}]
+
+  time = 6000 client requests seen = [{1, 303}]
+  time = 6000      db updates done = [{1, 305}, {2, 303}, {3, 303}, {4, 303}, {5, 303}, {6, 303}, {7, 303}]
+
+  time = 7000 client requests seen = [{1, 326}]
+  time = 7000      db updates done = [{1, 327}, {2, 326}, {3, 326}, {4, 326}, {5, 326}, {6, 326}, {7, 326}]
+
+  time = 8000 client requests seen = [{1, 344}]
+  time = 8000      db updates done = [{1, 345}, {2, 344}, {3, 344}, {4, 344}, {5, 344}, {6, 344}, {7, 344}]
+
+  time = 9000 client requests seen = [{1, 359}]
+  time = 9000      db updates done = [{1, 361}, {2, 359}, {3, 359}, {4, 359}, {5, 359}, {6, 359}, {7, 359}]
+
+  time = 10000 client requests seen = [{1, 374}]
+  time = 10000      db updates done = [{1, 375}, {2, 374}, {3, 374}, {4, 374}, {5, 374}, {6, 374}, {7, 374}]
+
+  time = 11000 client requests seen = [{1, 392}]
+  time = 11000      db updates done = [{1, 393}, {2, 392}, {3, 392}, {4, 392}, {5, 392}, {6, 392}, {7, 392}]
+
+  time = 12000 client requests seen = [{1, 408}]
+  time = 12000      db updates done = [{1, 409}, {2, 408}, {3, 408}, {4, 408}, {5, 408}, {6, 408}, {7, 408}]
+
+  Node server1_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server4_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server9_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server5_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server2_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server3_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 13000 client requests seen = [{1, 423}]
+  time = 13000      db updates done = [{1, 424}, {2, 423}, {3, 423}, {4, 423}, {5, 423}, {6, 423}, {7, 423}]
+
+  Node server8_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client1_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server7_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client3_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server6_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client6_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 14000 client requests seen = [{1, 427}, {2, 64}]
+  time = 14000      db updates done = [{1, 428}, {2, 492}, {3, 491}, {4, 427}, {5, 480}, {6, 491}, {7, 491}]
+
+  Node client2_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client8_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client5_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client9_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client10_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server10_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node raft_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 15000 client requests seen = [{1, 427}, {2, 64}]
+  time = 15000      db updates done = [{1, 428}, {2, 492}, {3, 491}, {4, 427}, {5, 480}, {6, 491}, {7, 491}]
+
+  Node client7_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client4_03_alicialawjy@127.0.0.1 exiting - maxtime reached
+[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004hcclear[?2004l
+
+[H[2J[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004hmmake cluster[?2004l
+
+mix compile
+-------------------------------------------------------------------
+  time = 1000 client requests seen = [{5, 141}]
+  time = 1000      db updates done = [{1, 141}, {2, 141}, {3, 141}, {4, 141}, {5, 142}, {6, 141}, {7, 141}]
+
+  time = 2000 client requests seen = [{5, 210}]
+  time = 2000      db updates done = [{1, 210}, {2, 210}, {3, 210}, {4, 210}, {5, 212}, {6, 210}, {7, 210}]
+
+  time = 3000 client requests seen = [{5, 253}]
+  time = 3000      db updates done = [{1, 253}, {2, 253}, {3, 253}, {4, 253}, {5, 255}, {6, 253}, {7, 253}]
+
+  time = 4000 client requests seen = [{5, 288}]
+  time = 4000      db updates done = [{1, 288}, {2, 288}, {3, 288}, {4, 288}, {5, 289}, {6, 288}, {7, 288}]
+
+  time = 5000 client requests seen = [{5, 316}]
+  time = 5000      db updates done = [{1, 316}, {2, 316}, {3, 316}, {4, 316}, {5, 318}, {6, 316}, {7, 316}]
+
+  time = 6000 client requests seen = [{5, 343}]
+  time = 6000      db updates done = [{1, 343}, {2, 343}, {3, 343}, {4, 343}, {5, 343}, {6, 343}, {7, 343}]
+
+  time = 7000 client requests seen = [{5, 366}]
+  time = 7000      db updates done = [{1, 366}, {2, 366}, {3, 366}, {4, 366}, {5, 368}, {6, 366}, {7, 366}]
+
+  time = 8000 client requests seen = [{5, 386}]
+  time = 8000      db updates done = [{1, 386}, {2, 386}, {3, 386}, {4, 386}, {5, 387}, {6, 386}, {7, 386}]
+
+  time = 9000 client requests seen = [{5, 406}]
+  time = 9000      db updates done = [{1, 406}, {2, 406}, {3, 406}, {4, 406}, {5, 407}, {6, 406}, {7, 406}]
+
+  time = 10000 client requests seen = [{5, 423}]
+  time = 10000      db updates done = [{1, 423}, {2, 423}, {3, 423}, {4, 423}, {5, 423}, {6, 423}, {7, 423}]
+
+  time = 11000 client requests seen = [{5, 441}]
+  time = 11000      db updates done = [{1, 441}, {2, 441}, {3, 441}, {4, 441}, {5, 442}, {6, 441}, {7, 441}]
+
+  Node server1_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server2_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 12000 client requests seen = [{5, 457}]
+  time = 12000      db updates done = [{1, 457}, {2, 457}, {3, 457}, {4, 457}, {5, 458}, {6, 457}, {7, 457}]
+
+  Node server3_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server4_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server5_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server6_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server7_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server8_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client3_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server9_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 13000 client requests seen = [{5, 467}]
+  time = 13000      db updates done = [{1, 466}, {2, 466}, {3, 467}, {4, 467}, {5, 468}, {6, 467}, {7, 467}]
+
+  Node client1_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client6_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client5_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client7_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 14000 client requests seen = [{5, 467}]
+  time = 14000      db updates done = [{1, 466}, {2, 466}, {3, 467}, {4, 467}, {5, 468}, {6, 467}, {7, 467}]
+
+  Node client4_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server10_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client9_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client2_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client8_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client10_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node raft_37_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 15000 client requests seen = [{5, 467}]
+  time = 15000      db updates done = [{1, 466}, {2, 466}, {3, 467}, {4, 467}, {5, 468}, {6, 467}, {7, 467}]
+
+[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004hcclear[?2004l
+
+[H[2J[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004hmmake cluster[?2004l
+
+mix compile
+-------------------------------------------------------------------
+  time = 1000 client requests seen = [{5, 169}]
+  time = 1000      db updates done = [{1, 169}, {2, 169}, {3, 169}, {4, 169}, {5, 170}, {6, 169}]
+
+  time = 2000 client requests seen = [{5, 224}]
+  time = 2000      db updates done = [{1, 224}, {2, 224}, {3, 224}, {4, 224}, {5, 226}, {6, 224}]
+
+  time = 3000 client requests seen = [{5, 253}]
+  time = 3000      db updates done = [{1, 253}, {2, 253}, {3, 253}, {4, 253}, {5, 255}, {6, 253}]
+
+  time = 4000 client requests seen = [{5, 276}]
+  time = 4000      db updates done = [{1, 276}, {2, 276}, {3, 276}, {4, 276}, {5, 278}, {6, 276}]
+
+  time = 5000 client requests seen = [{5, 306}]
+  time = 5000      db updates done = [{1, 306}, {2, 306}, {3, 306}, {4, 306}, {5, 308}, {6, 306}]
+
+  time = 6000 client requests seen = [{5, 335}]
+  time = 6000      db updates done = [{1, 335}, {2, 335}, {3, 335}, {4, 335}, {5, 338}, {6, 335}]
+
+  time = 7000 client requests seen = [{5, 355}]
+  time = 7000      db updates done = [{1, 355}, {2, 355}, {3, 355}, {4, 355}, {5, 357}, {6, 355}]
+
+  time = 8000 client requests seen = [{5, 380}]
+  time = 8000      db updates done = [{1, 380}, {2, 380}, {3, 380}, {4, 380}, {5, 382}, {6, 380}]
+
+  time = 9000 client requests seen = [{5, 402}]
+  time = 9000      db updates done = [{1, 402}, {2, 402}, {3, 402}, {4, 402}, {5, 404}, {6, 402}]
+
+  time = 10000 client requests seen = [{5, 424}]
+  time = 10000      db updates done = [{1, 424}, {2, 424}, {3, 424}, {4, 424}, {5, 427}, {6, 424}]
+
+  time = 11000 client requests seen = [{5, 439}]
+  time = 11000      db updates done = [{1, 439}, {2, 439}, {3, 439}, {4, 439}, {5, 440}, {6, 439}]
+
+  Node server1_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server2_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 12000 client requests seen = [{5, 453}]
+  time = 12000      db updates done = [{1, 453}, {2, 453}, {3, 453}, {4, 453}, {5, 454}, {6, 453}]
+
+  Node server3_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server4_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server8_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server6_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server9_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 13000 client requests seen = [{5, 461}]
+  time = 13000      db updates done = [{1, 461}, {2, 461}, {3, 461}, {4, 461}, {5, 463}, {6, 461}]
+
+  Node server5_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server7_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client6_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server10_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client1_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client3_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client5_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 14000 client requests seen = [{5, 465}]
+  time = 14000      db updates done = [{1, 461}, {2, 461}, {3, 462}, {4, 463}, {5, 465}, {6, 464}]
+
+  Node client7_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client10_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client2_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client8_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client4_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 15000 client requests seen = [{5, 465}]
+  time = 15000      db updates done = [{1, 461}, {2, 461}, {3, 462}, {4, 463}, {5, 465}, {6, 464}]
+
+  Node raft_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client9_35_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 16000 client requests seen = [{5, 465}]
+  time = 16000      db updates done = [{1, 461}, {2, 461}, {3, 462}, {4, 463}, {5, 465}, {6, 464}]
+
+[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004hcclear[?2004l
+
+[H[2J[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004hmmake cluster[?2004l
+
+mix compile
+-------------------------------------------------------------------
+  time = 1000 client requests seen = [{4, 145}]
+  time = 1000      db updates done = [{1, 146}, {2, 146}, {3, 146}, {4, 147}, {5, 146}]
+
+  time = 2000 client requests seen = [{4, 230}]
+  time = 2000      db updates done = [{1, 230}, {2, 230}, {3, 230}, {4, 232}, {5, 230}]
+
+  time = 3000 client requests seen = [{4, 287}]
+  time = 3000      db updates done = [{1, 287}, {2, 287}, {3, 287}, {4, 289}, {5, 287}]
+
+  time = 4000 client requests seen = [{4, 325}]
+  time = 4000      db updates done = [{1, 325}, {2, 325}, {3, 325}, {4, 327}, {5, 325}]
+
+  time = 5000 client requests seen = [{4, 364}]
+  time = 5000      db updates done = [{1, 364}, {2, 364}, {3, 364}, {4, 365}, {5, 364}]
+
+  time = 6000 client requests seen = [{4, 395}]
+  time = 6000      db updates done = [{1, 395}, {2, 395}, {3, 395}, {4, 396}, {5, 395}]
+
+  time = 7000 client requests seen = [{4, 424}]
+  time = 7000      db updates done = [{1, 424}, {2, 424}, {3, 424}, {4, 425}, {5, 424}]
+
+  time = 8000 client requests seen = [{4, 447}]
+  time = 8000      db updates done = [{1, 447}, {2, 447}, {3, 447}, {4, 449}, {5, 447}]
+
+  time = 9000 client requests seen = [{4, 472}]
+  time = 9000      db updates done = [{1, 472}, {2, 472}, {3, 472}, {4, 474}, {5, 472}]
+
+  time = 10000 client requests seen = [{4, 496}]
+  time = 10000      db updates done = [{1, 496}, {2, 496}, {3, 496}, {4, 498}, {5, 496}]
+
+  time = 11000 client requests seen = [{4, 516}]
+  time = 11000      db updates done = [{1, 516}, {2, 516}, {3, 516}, {4, 518}, {5, 516}]
+
+  Node server1_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server2_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 12000 client requests seen = [{4, 537}]
+  time = 12000      db updates done = [{1, 537}, {2, 537}, {3, 537}, {4, 538}, {5, 537}]
+
+  Node server3_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server5_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 13000 client requests seen = [{4, 555}]
+  time = 13000      db updates done = [{1, 553}, {2, 555}, {3, 555}, {4, 557}, {5, 555}]
+
+  Node server4_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server10_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client2_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client3_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server9_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client4_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client5_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server8_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client10_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 14000 client requests seen = [{4, 560}]
+  time = 14000      db updates done = [{1, 553}, {2, 555}, {3, 560}, {4, 561}, {5, 560}]
+
+  Node server6_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client1_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client7_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node server7_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client8_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node raft_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  time = 15000 client requests seen = [{4, 560}]
+  time = 15000      db updates done = [{1, 553}, {2, 555}, {3, 560}, {4, 561}, {5, 560}]
+
+  Node client6_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+  Node client9_07_alicialawjy@127.0.0.1 exiting - maxtime reached
+[1m[7m%[27m[1m[0m                                                                                                                                                                                                   
+ 
+
+[0m[27m[24m[Jalicialawjy@Alicias-Macbook-Pro raft % [K[?2004h

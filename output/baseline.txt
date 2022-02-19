@@ -1,0 +1,53 @@
+Script started on Sat Feb 19 19:59:50 2022
+
+- server                    : 3
+- client                    : 3
+- max_client_requests       : 5000,      
+- client_request_interval   : 5,        
+- client_reply_timeout      : 50 
+
+-------------------------------------------------------------------
+  time = 1000 client requests seen = [{2, 289}]
+  time = 1000      db updates done = [{1, 289}, {2, 289}, {3, 289}]
+
+  time = 2000 client requests seen = [{2, 467}]
+  time = 2000      db updates done = [{1, 467}, {2, 467}, {3, 467}]
+
+  time = 3000 client requests seen = [{2, 494}]
+  time = 3000      db updates done = [{1, 494}, {2, 496}, {3, 494}]
+
+  time = 4000 client requests seen = [{2, 513}]
+  time = 4000      db updates done = [{1, 513}, {2, 515}, {3, 513}]
+
+  time = 5000 client requests seen = [{2, 533}]
+  time = 5000      db updates done = [{1, 534}, {2, 535}, {3, 534}]
+
+  time = 6000 client requests seen = [{2, 553}]
+  time = 6000      db updates done = [{1, 555}, {2, 555}, {3, 555}]
+
+  time = 7000 client requests seen = [{2, 576}]
+  time = 7000      db updates done = [{1, 579}, {2, 579}, {3, 579}]
+
+  time = 8000 client requests seen = [{2, 593}]
+  time = 8000      db updates done = [{1, 596}, {2, 596}, {3, 596}]
+
+  time = 9000 client requests seen = [{2, 611}]
+  time = 9000      db updates done = [{1, 613}, {2, 613}, {3, 613}]
+
+  time = 10000 client requests seen = [{2, 626}]
+  time = 10000      db updates done = [{1, 629}, {2, 629}, {3, 629}]
+
+  time = 11000 client requests seen = [{2, 643}]
+  time = 11000      db updates done = [{1, 643}, {2, 644}, {3, 643}]
+
+  time = 12000 client requests seen = [{2, 656}]
+  time = 12000      db updates done = [{1, 657}, {2, 659}, {3, 657}]
+
+  time = 13000 client requests seen = [{2, 672}]
+  time = 13000      db updates done = [{1, 672}, {2, 674}, {3, 672}]
+
+  time = 14000 client requests seen = [{2, 687}]
+  time = 14000      db updates done = [{1, 689}, {2, 689}, {3, 689}]
+
+  time = 15000 client requests seen = [{2, 695}]
+  time = 15000      db updates done = [{1, 695}, {2, 695}, {3, 695}]

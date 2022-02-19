@@ -1,0 +1,173 @@
+
+-------------------------------------------------------------------
+monitor spawned
+server 1 starts
+server 2 starts
+db spawned
+servers binded
+server 3 starts
+client spawned
+Server 1 Election Timeout - START
+Server 1 runs for candidate in term 1
+Server 3 Election Timeout - START
+Server 3 runs for candidate in term 1
+Server 2 Election Timeout - START
+Server 2 runs for candidate in term 1
+Server 1 Election Timeout - START
+Server 1 runs for candidate in term 2
+Server 3 stepdown at receiving vote request
+Server 2 stepdown at receiving vote request
+Server 3 voted for Server 1 in term 2
+Server 2 voted for Server 1 in term 2
+New leader elected! Server 1 is leader for Term 2
+New leader's log: %{}
+
+
+Server 3 Election Timeout - START
+Server 3 runs for candidate in term 3
+Server 2 stepdown at receiving vote request
+Server 2 voted for Server 3 in term 3
+New leader elected! Server 3 is leader for Term 3
+New leader's log: %{
+  1 => %{
+    request: %{
+      cid: {1, 1},
+      clientP: #PID<18507.147.0>,
+      cmd: {:MOVE, 533, 45, 50}
+    },
+    term: 2
+  }
+}
+Leader 3 send client_request {1, 1} %{cid: {1, 1}, clientP: #PID<18507.147.0>, cmd: {:MOVE, 533, 45, 50}} to client #PID<18507.147.0>
+Client receive {1, 1} reply from leader
+Server 1 stepdown at receiving vote request
+Leader 3 send client_request {1, 2} %{cid: {1, 2}, clientP: #PID<18507.147.0>, cmd: {:MOVE, 355, 69, 51}} to client #PID<18507.147.0>
+Client receive {1, 2} reply from leader
+Node client1_44_alicialawjy@127.0.0.1 Going to Sleep - Client 1 all requests completed = 2
+  time = 1000 client requests seen = [{3, 2}]
+  time = 1000      db updates done = [{1, 2}, {2, 2}, {3, 2}]
+
+
+Server 1 Election Timeout - START
+Server 1 runs for candidate in term 4
+Server 2 stepdown at receiving vote request
+Server 2 voted for Server 1 in term 4
+New leader elected! Server 1 is leader for Term 4
+New leader's log: %{
+  1 => %{
+    request: %{
+      cid: {1, 1},
+      clientP: #PID<18473.147.0>,
+      cmd: {:MOVE, 533, 45, 50}
+    },
+    term: 2
+  },
+  2 => %{
+    request: %{
+      cid: {1, 2},
+      clientP: #PID<18473.147.0>,
+      cmd: {:MOVE, 355, 69, 51}
+    },
+    term: 3
+  },
+  3 => %{
+    request: %{
+      cid: {2, 1},
+      clientP: #PID<18474.147.0>,
+      cmd: {:MOVE, 191, 65, 85}
+    },
+    term: 3
+  },
+  4 => %{
+    request: %{
+      cid: {3, 1},
+      clientP: #PID<18475.147.0>,
+      cmd: {:MOVE, 834, 84, 77}
+    },
+    term: 3
+  }
+}
+Leader 1 send client_request {2, 1} %{cid: {2, 1}, clientP: #PID<18474.147.0>, cmd: {:MOVE, 191, 65, 85}} to client #PID<18474.147.0>
+Leader 1 send client_request {3, 1} %{cid: {3, 1}, clientP: #PID<18475.147.0>, cmd: {:MOVE, 834, 84, 77}} to client #PID<18475.147.0>
+Client receive {2, 1} reply from leader
+Client receive {3, 1} reply from leader
+Server 3 stepdown at receiving vote request
+Server 3 voted for Server 1 in term 4
+
+
+Server 3 Election Timeout - START
+Server 3 runs for candidate in term 5
+Server 2 stepdown at receiving vote request
+Server 2 voted for Server 3 in term 5
+New leader elected! Server 3 is leader for Term 5
+New leader's log: %{
+  1 => %{
+    request: %{
+      cid: {1, 1},
+      clientP: #PID<18507.147.0>,
+      cmd: {:MOVE, 533, 45, 50}
+    },
+    term: 2
+  },
+  2 => %{
+    request: %{
+      cid: {1, 2},
+      clientP: #PID<18507.147.0>,
+      cmd: {:MOVE, 355, 69, 51}
+    },
+    term: 3
+  },
+  3 => %{
+    request: %{
+      cid: {2, 1},
+      clientP: #PID<18506.147.0>,
+      cmd: {:MOVE, 191, 65, 85}
+    },
+    term: 3
+  },
+  4 => %{
+    request: %{
+      cid: {3, 1},
+      clientP: #PID<18508.147.0>,
+      cmd: {:MOVE, 834, 84, 77}
+    },
+    term: 3
+  },
+  5 => %{
+    request: %{
+      cid: {3, 2},
+      clientP: #PID<18508.147.0>,
+      cmd: {:MOVE, 446, 42, 24}
+    },
+    term: 4
+  },
+  6 => %{
+    request: %{
+      cid: {2, 2},
+      clientP: #PID<18506.147.0>,
+      cmd: {:MOVE, 180, 53, 99}
+    },
+    term: 4
+  }
+}
+  time = 1500 client requests seen = [{1, 2}, {3, 2}]
+  time = 1500      db updates done = [{1, 4}, {2, 4}, {3, 4}]
+
+Leader 3 send client_request {3, 2} %{cid: {3, 2}, clientP: #PID<18508.147.0>, cmd: {:MOVE, 446, 42, 24}} to client #PID<18508.147.0>
+Leader 3 send client_request {2, 2} %{cid: {2, 2}, clientP: #PID<18506.147.0>, cmd: {:MOVE, 180, 53, 99}} to client #PID<18506.147.0>
+Client receive {3, 2} reply from leader
+Client receive {2, 2} reply from leader
+
+Node client3_44_alicialawjy@127.0.0.1 Going to Sleep - Client 3 all requests completed = 2
+Node client2_44_alicialawjy@127.0.0.1 Going to Sleep - Client 2 all requests completed = 2
+  time = 2000 client requests seen = [{1, 2}, {3, 4}]
+  time = 2000      db updates done = [{1, 6}, {2, 6}, {3, 6}]
+
+  time = 2500 client requests seen = [{1, 2}, {3, 4}]
+  time = 2500      db updates done = [{1, 6}, {2, 6}, {3, 6}]
+
+  time = 3000 client requests seen = [{1, 2}, {3, 4}]
+  time = 3000      db updates done = [{1, 6}, {2, 6}, {3, 6}]
+
+  time = 3500 client requests seen = [{1, 2}, {3, 4}]
+  time = 3500      db updates done = [{1, 6}, {2, 6}, {3, 6}]

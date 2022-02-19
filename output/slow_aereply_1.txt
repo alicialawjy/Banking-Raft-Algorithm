@@ -1,0 +1,46 @@
+Script started on Sat Feb 19 20:00:52 2022
+-------------------------------------------------------------------
+  time = 1000 client requests seen = [{2, 3}]
+  time = 1000      db updates done = [{2, 3}]
+
+  time = 2000 client requests seen = [{2, 3}]
+  time = 2000      db updates done = [{2, 3}]
+
+  time = 3000 client requests seen = [{2, 3}]
+  time = 3000      db updates done = [{1, 1}, {2, 3}, {3, 1}]
+
+  time = 4000 client requests seen = [{2, 4}]
+  time = 4000      db updates done = [{1, 1}, {2, 4}, {3, 1}]
+
+  time = 5000 client requests seen = [{2, 4}]
+  time = 5000      db updates done = [{1, 1}, {2, 4}, {3, 1}]
+
+  time = 6000 client requests seen = [{2, 4}]
+  time = 6000      db updates done = [{1, 1}, {2, 4}, {3, 1}]
+
+  time = 7000 client requests seen = [{2, 4}]
+  time = 7000      db updates done = [{1, 1}, {2, 4}, {3, 1}]
+
+  time = 8000 client requests seen = [{2, 4}]
+  time = 8000      db updates done = [{1, 1}, {2, 4}, {3, 1}]
+
+  time = 9000 client requests seen = [{2, 5}]
+  time = 9000      db updates done = [{1, 2}, {2, 5}, {3, 2}]
+
+  time = 10000 client requests seen = [{2, 5}]
+  time = 10000      db updates done = [{1, 2}, {2, 5}, {3, 2}]
+
+  time = 11000 client requests seen = [{2, 5}]
+  time = 11000      db updates done = [{1, 2}, {2, 5}, {3, 2}]
+
+  time = 12000 client requests seen = [{2, 5}]
+  time = 12000      db updates done = [{1, 2}, {2, 5}, {3, 2}]
+
+  time = 13000 client requests seen = [{2, 5}]
+  time = 13000      db updates done = [{1, 2}, {2, 5}, {3, 2}]
+
+  time = 14000 client requests seen = [{2, 5}]
+  time = 14000      db updates done = [{1, 2}, {2, 5}, {3, 2}]
+
+  time = 15000 client requests seen = [{2, 5}]
+  time = 15000      db updates done = [{1, 2}, {2, 5}, {3, 2}]

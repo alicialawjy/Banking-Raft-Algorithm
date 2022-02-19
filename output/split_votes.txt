@@ -1,0 +1,74 @@
+Script started on Sat Feb 19 18:52:31 2022
+
+Parameters: election_timeout_range - 25..50
+
+mix compile
+-------------------------------------------------------------------
+monitor spawned
+server 1 starts
+server 2 starts
+db spawned
+servers binded
+server 3 starts
+client spawned
+Server 2 Election Timeout - START
+Server 1 Election Timeout - START
+Server 2 runs for candidate in term 1
+Server 1 runs for candidate in term 1
+Server 3 Election Timeout - START
+Server 3 runs for candidate in term 1
+
+Server 2 Election Timeout - START
+Server 2 runs for candidate in term 2
+Server 1 Election Timeout - START
+Server 1 runs for candidate in term 2
+Server 3 Election Timeout - START
+Server 3 runs for candidate in term 2
+Server 2 received vote req from Server 1 but did not vote
+Server 1 received vote req from Server 2 but did not vote
+Server 1 received vote req from Server 3 but did not vote
+Server 3 received vote req from Server 1 but did not vote
+Server 2 received vote req from Server 3 but did not vote
+Server 3 received vote req from Server 2 but did not vote
+
+Server 2 Election Timeout - START
+Server 2 runs for candidate in term 3
+Server 3 stepdown at receiving vote request
+Server 1 stepdown at receiving vote request
+Server 3 voted for Server 2 in term 3
+Server 1 voted for Server 2 in term 3
+New leader elected! Server 2 is leader for Term 3
+
+Leader 2 send client_request {1, 1} %{cid: {1, 1}, clientP: #PID<18531.147.0>, cmd: {:MOVE, 433, 6, 7}} to client #PID<18531.147.0>
+Leader 2 send client_request {2, 1} %{cid: {2, 1}, clientP: #PID<18530.147.0>, cmd: {:MOVE, 712, 70, 98}} to client #PID<18530.147.0>
+Leader 2 send client_request {3, 1} %{cid: {3, 1}, clientP: #PID<18529.147.0>, cmd: {:MOVE, 1000, 85, 59}} to client #PID<18529.147.0>
+Client receive {1, 1} reply from leader
+Client receive {3, 1} reply from leader
+Client receive {2, 1} reply from leader
+Leader 2 send client_request {3, 2} %{cid: {3, 2}, clientP: #PID<18529.147.0>, cmd: {:MOVE, 149, 97, 25}} to client #PID<18529.147.0>
+Leader 2 send client_request {2, 2} %{cid: {2, 2}, clientP: #PID<18530.147.0>, cmd: {:MOVE, 19, 56, 49}} to client #PID<18530.147.0>
+Client receive {3, 2} reply from leader
+Leader 2 send client_request {1, 2} %{cid: {1, 2}, clientP: #PID<18531.147.0>, cmd: {:MOVE, 364, 57, 21}} to client #PID<18531.147.0>
+Client receive {1, 2} reply from leader
+Client receive {2, 2} reply from leader
+Node client3_43_alicialawjy@127.0.0.1 Going to Sleep - Client 3 all requests completed = 2
+Node client2_43_alicialawjy@127.0.0.1 Going to Sleep - Client 2 all requests completed = 2
+Node client1_43_alicialawjy@127.0.0.1 Going to Sleep - Client 1 all requests completed = 2
+
+  time = 500 client requests seen = [{2, 6}]
+  time = 500      db updates done = [{1, 6}, {2, 6}, {3, 6}]
+
+  time = 1000 client requests seen = [{2, 6}]
+  time = 1000      db updates done = [{1, 6}, {2, 6}, {3, 6}]
+
+  time = 1500 client requests seen = [{2, 6}]
+  time = 1500      db updates done = [{1, 6}, {2, 6}, {3, 6}]
+
+  time = 2000 client requests seen = [{2, 6}]
+  time = 2000      db updates done = [{1, 6}, {2, 6}, {3, 6}]
+
+  time = 2500 client requests seen = [{2, 6}]
+  time = 2500      db updates done = [{1, 6}, {2, 6}, {3, 6}]
+
+  time = 3000 client requests seen = [{2, 6}]
+  time = 3000      db updates done = [{1, 6}, {2, 6}, {3, 6}]

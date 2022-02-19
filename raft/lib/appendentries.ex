@@ -40,7 +40,6 @@ defmodule AppendEntries do
 
     # (ii) If my current term is larger than the leader's, reject leader
     if s.curr_term > leaderTerm do
-      # Process.sleep(20)
       # #IO.puts("Server #{s.server_num} rejecting aeReq from leader bec have a larger term")
       send s.leaderP, {:APPEND_ENTRIES_REPLY, s.selfP, s.curr_term, false, nil}
     end # if
@@ -57,7 +56,6 @@ defmodule AppendEntries do
       end # if
 
     if s.curr_term == leaderTerm do
-      # Process.sleep(20)
       send s.leaderP, {:APPEND_ENTRIES_REPLY, s.selfP, s.curr_term, success, s.commit_index}
     end
 
@@ -152,16 +150,5 @@ defmodule AppendEntries do
 
    s
   end
-
-  # prevIndex = s.next_index[followerP]
-  # send followerP, {:APPEND_ENTRIES_REQUEST, s.curr_term, prevIndex, Log.term_at(s, prevIndex), Log.get_entries(s,[(prevIndex+1)..Log.last_index(s)]), s.commit_index }
-
-  #  if s.next_index[followerP] < Log.last_index(s) do
-  #   send followerP {:APPEND_ENTRIES_REQUEST, Log.entry_at()}
-  #   # request, prevIndex, prevTerm, leaderTerm, commitIndex
-  #  end
-
-# def send_entries_reply_to_leader(leader, isAppended)
-# def receive_append_entries_reply_from_follower
 
 end # AppendEntriess

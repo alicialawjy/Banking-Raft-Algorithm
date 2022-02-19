@@ -1,0 +1,322 @@
+Parameters:
+- server                    : 10
+- client                    : 5
+- max_client_requests       : 5000,      
+- client_request_interval   : 1,        
+- client_reply_timeout      : 10 
+-------------------------------------------------------------------
+  time = 1000 client requests seen = [{4, 97}]
+  time = 1000      db updates done = [{1, 97}, {2, 97}, {3, 97}, {4, 98}, {5, 97}, {6, 97}, {7, 97}, {8, 97}, {9, 97}, {10, 97}]
+
+  time = 2000 client requests seen = [{4, 151}]
+  time = 2000      db updates done = [{1, 151}, {2, 151}, {3, 151}, {4, 152}, {5, 151}, {6, 151}, {7, 151}, {8, 151}, {9, 151}, {10, 151}]
+
+  time = 3000 client requests seen = [{4, 183}]
+  time = 3000      db updates done = [{1, 183}, {2, 183}, {3, 183}, {4, 186}, {5, 183}, {6, 183}, {7, 183}, {8, 183}, {9, 183}, {10, 183}]
+
+  time = 4000 client requests seen = [{4, 213}]
+  time = 4000      db updates done = [{1, 213}, {2, 213}, {3, 213}, {4, 215}, {5, 213}, {6, 213}, {7, 213}, {8, 213}, {9, 213}, {10, 213}]
+
+  time = 5000 client requests seen = [{4, 237}]
+  time = 5000      db updates done = [{1, 238}, {2, 238}, {3, 238}, {4, 238}, {5, 238}, {6, 238}, {7, 238}, {8, 238}, {9, 238}, {10, 238}]
+
+  time = 6000 client requests seen = [{4, 258}]
+  time = 6000      db updates done = [{1, 258}, {2, 258}, {3, 258}, {4, 260}, {5, 258}, {6, 258}, {7, 258}, {8, 258}, {9, 258}, {10, 258}]
+
+  time = 7000 client requests seen = [{4, 277}]
+  time = 7000      db updates done = [{1, 278}, {2, 278}, {3, 278}, {4, 278}, {5, 278}, {6, 278}, {7, 278}, {8, 278}, {9, 278}, {10, 278}]
+
+  time = 8000 client requests seen = [{4, 295}]
+  time = 8000      db updates done = [{1, 295}, {2, 295}, {3, 295}, {4, 297}, {5, 295}, {6, 295}, {7, 295}, {8, 295}, {9, 295}, {10, 295}]
+
+  time = 9000 client requests seen = [{4, 312}]
+  time = 9000      db updates done = [{1, 312}, {2, 312}, {3, 312}, {4, 313}, {5, 312}, {6, 312}, {7, 312}, {8, 312}, {9, 312}, {10, 312}]
+
+  time = 10000 client requests seen = [{4, 328}]
+  time = 10000      db updates done = [{1, 328}, {2, 328}, {3, 328}, {4, 329}, {5, 328}, {6, 328}, {7, 328}, {8, 328}, {9, 328}, {10, 328}]
+
+  time = 11000 client requests seen = [{4, 343}]
+  time = 11000      db updates done = [{1, 343}, {2, 343}, {3, 343}, {4, 344}, {5, 343}, {6, 343}, {7, 343}, {8, 343}, {9, 343}, {10, 343}]
+
+  time = 12000 client requests seen = [{4, 353}]
+  time = 12000      db updates done = [{1, 353}, {2, 353}, {3, 353}, {4, 354}, {5, 353}, {6, 353}, {7, 353}, {8, 353}, {9, 353}, {10, 353}]
+
+  time = 13000 client requests seen = [{4, 364}]
+  time = 13000      db updates done = [{1, 364}, {2, 364}, {3, 364}, {4, 366}, {5, 364}, {6, 364}, {7, 364}, {8, 364}, {9, 364}, {10, 364}]
+
+  time = 14000 client requests seen = [{4, 367}]
+  time = 14000      db updates done = [{1, 364}, {2, 366}, {3, 366}, {4, 368}, {5, 367}, {6, 367}, {7, 367}, {8, 367}, {9, 367}, {10, 367}]
+
+  time = 15000 client requests seen = [{4, 367}]
+  time = 15000      db updates done = [{1, 364}, {2, 366}, {3, 366}, {4, 368}, {5, 367}, {6, 367}, {7, 367}, {8, 367}, {9, 367}, {10, 367}]
+
+-------------------------------------------------------------------
+Parameters:
+- server                    : 9
+- client                    : 5
+- max_client_requests       : 5000,      
+- client_request_interval   : 1,        
+- client_reply_timeout      : 10 
+
+-------------------------------------------------------------------
+  time = 1000 client requests seen = [{1, 100}]
+  time = 1000      db updates done = [{1, 101}, {2, 100}, {3, 100}, {4, 100}, {5, 100}, {6, 100}, {7, 100}, {8, 100}, {9, 100}]
+
+  time = 2000 client requests seen = [{1, 150}]
+  time = 2000      db updates done = [{1, 153}, {2, 150}, {3, 150}, {4, 150}, {5, 150}, {6, 150}, {7, 150}, {8, 150}, {9, 150}]
+
+  time = 3000 client requests seen = [{1, 186}]
+  time = 3000      db updates done = [{1, 188}, {2, 186}, {3, 186}, {4, 186}, {5, 186}, {6, 186}, {7, 186}, {8, 186}, {9, 186}]
+
+  time = 4000 client requests seen = [{1, 212}]
+  time = 4000      db updates done = [{1, 213}, {2, 212}, {3, 212}, {4, 212}, {5, 212}, {6, 212}, {7, 212}, {8, 212}, {9, 212}]
+
+  time = 5000 client requests seen = [{1, 224}]
+  time = 5000      db updates done = [{1, 225}, {2, 224}, {3, 224}, {4, 224}, {5, 224}, {6, 224}, {7, 224}, {8, 224}, {9, 224}]
+
+  time = 6000 client requests seen = [{1, 245}]
+  time = 6000      db updates done = [{1, 248}, {2, 245}, {3, 245}, {4, 245}, {5, 245}, {6, 245}, {7, 245}, {8, 245}, {9, 245}]
+
+  time = 7000 client requests seen = [{1, 265}]
+  time = 7000      db updates done = [{1, 267}, {2, 265}, {3, 265}, {4, 265}, {5, 265}, {6, 265}, {7, 265}, {8, 265}, {9, 265}]
+
+  time = 8000 client requests seen = [{1, 279}]
+  time = 8000      db updates done = [{1, 280}, {2, 279}, {3, 279}, {4, 279}, {5, 279}, {6, 279}, {7, 279}, {8, 279}, {9, 279}]
+
+  time = 9000 client requests seen = [{1, 290}]
+  time = 9000      db updates done = [{1, 292}, {2, 290}, {3, 290}, {4, 290}, {5, 290}, {6, 290}, {7, 290}, {8, 290}, {9, 290}]
+
+  time = 10000 client requests seen = [{1, 307}]
+  time = 10000      db updates done = [{1, 309}, {2, 307}, {3, 307}, {4, 307}, {5, 307}, {6, 307}, {7, 307}, {8, 307}, {9, 307}]
+
+  time = 11000 client requests seen = [{1, 320}]
+  time = 11000      db updates done = [{1, 321}, {2, 320}, {3, 320}, {4, 320}, {5, 320}, {6, 320}, {7, 320}, {8, 320}, {9, 320}]
+
+  time = 12000 client requests seen = [{1, 333}]
+  time = 12000      db updates done = [{1, 335}, {2, 333}, {3, 333}, {4, 333}, {5, 333}, {6, 333}, {7, 333}, {8, 333}, {9, 333}]
+
+  time = 13000 client requests seen = [{1, 349}]
+  time = 13000      db updates done = [{1, 350}, {2, 349}, {3, 349}, {4, 349}, {5, 349}, {6, 349}, {7, 349}, {8, 349}, {9, 349}]
+
+  time = 14000 client requests seen = [{1, 354}, {3, 49}]
+  time = 14000      db updates done = [{1, 355}, {2, 379}, {3, 406}, {4, 404}, {5, 353}, {6, 404}, {7, 404}, {8, 404}, {9, 404}]
+
+  time = 15000 client requests seen = [{1, 354}, {3, 49}]
+  time = 15000      db updates done = [{1, 355}, {2, 379}, {3, 406}, {4, 404}, {5, 353}, {6, 404}, {7, 404}, {8, 404}, {9, 404}]
+
+-------------------------------------------------------------------
+Parameters:
+- server                    : 8
+- client                    : 5
+- max_client_requests       : 5000,      
+- client_request_interval   : 1,        
+- client_reply_timeout      : 10 
+
+-------------------------------------------------------------------
+  time = 1000 client requests seen = [{6, 113}]
+  time = 1000      db updates done = [{1, 114}, {2, 114}, {3, 114}, {4, 114}, {5, 114}, {6, 115}, {7, 114}, {8, 114}]
+
+  time = 2000 client requests seen = [{6, 168}]
+  time = 2000      db updates done = [{1, 168}, {2, 168}, {3, 168}, {4, 168}, {5, 168}, {6, 169}, {7, 168}, {8, 168}]
+
+  time = 3000 client requests seen = [{6, 210}]
+  time = 3000      db updates done = [{1, 210}, {2, 210}, {3, 210}, {4, 210}, {5, 210}, {6, 211}, {7, 210}, {8, 210}]
+
+  time = 4000 client requests seen = [{6, 246}]
+  time = 4000      db updates done = [{1, 246}, {2, 246}, {3, 246}, {4, 246}, {5, 246}, {6, 248}, {7, 246}, {8, 246}]
+
+  time = 5000 client requests seen = [{6, 279}]
+  time = 5000      db updates done = [{1, 279}, {2, 279}, {3, 279}, {4, 279}, {5, 279}, {6, 281}, {7, 279}, {8, 279}]
+
+  time = 6000 client requests seen = [{6, 306}]
+  time = 6000      db updates done = [{1, 306}, {2, 306}, {3, 306}, {4, 306}, {5, 306}, {6, 308}, {7, 306}, {8, 306}]
+
+  time = 7000 client requests seen = [{6, 329}]
+  time = 7000      db updates done = [{1, 329}, {2, 329}, {3, 329}, {4, 329}, {5, 329}, {6, 331}, {7, 329}, {8, 329}]
+
+  time = 8000 client requests seen = [{6, 349}]
+  time = 8000      db updates done = [{1, 349}, {2, 349}, {3, 349}, {4, 349}, {5, 349}, {6, 350}, {7, 349}, {8, 349}]
+
+  time = 9000 client requests seen = [{6, 369}]
+  time = 9000      db updates done = [{1, 369}, {2, 369}, {3, 369}, {4, 369}, {5, 369}, {6, 371}, {7, 369}, {8, 369}]
+
+  time = 10000 client requests seen = [{6, 387}]
+  time = 10000      db updates done = [{1, 387}, {2, 387}, {3, 387}, {4, 387}, {5, 387}, {6, 389}, {7, 387}, {8, 387}]
+
+  time = 11000 client requests seen = [{6, 406}]
+  time = 11000      db updates done = [{1, 406}, {2, 406}, {3, 406}, {4, 406}, {5, 406}, {6, 407}, {7, 406}, {8, 406}]
+
+  time = 12000 client requests seen = [{6, 422}]
+  time = 12000      db updates done = [{1, 422}, {2, 422}, {3, 422}, {4, 422}, {5, 422}, {6, 424}, {7, 422}, {8, 422}]
+
+  time = 13000 client requests seen = [{6, 437}]
+  time = 13000      db updates done = [{1, 437}, {2, 437}, {3, 437}, {4, 437}, {5, 437}, {6, 439}, {7, 437}, {8, 437}]
+
+  time = 14000 client requests seen = [{6, 450}]
+  time = 14000      db updates done = [{1, 449}, {2, 450}, {3, 450}, {4, 450}, {5, 450}, {6, 451}, {7, 450}, {8, 450}]
+
+  time = 15000 client requests seen = [{6, 452}]
+  time = 15000      db updates done = [{1, 449}, {2, 450}, {3, 450}, {4, 451}, {5, 451}, {6, 454}, {7, 454}, {8, 454}]
+
+-------------------------------------------------------------------
+
+Parameters:
+- server                    : 7
+- client                    : 5
+- max_client_requests       : 5000,      
+- client_request_interval   : 1,        
+- client_reply_timeout      : 10 
+-------------------------------------------------------------------
+  time = 1000 client requests seen = [{5, 141}]
+  time = 1000      db updates done = [{1, 141}, {2, 141}, {3, 141}, {4, 141}, {5, 142}, {6, 141}, {7, 141}]
+
+  time = 2000 client requests seen = [{5, 210}]
+  time = 2000      db updates done = [{1, 210}, {2, 210}, {3, 210}, {4, 210}, {5, 212}, {6, 210}, {7, 210}]
+
+  time = 3000 client requests seen = [{5, 253}]
+  time = 3000      db updates done = [{1, 253}, {2, 253}, {3, 253}, {4, 253}, {5, 255}, {6, 253}, {7, 253}]
+
+  time = 4000 client requests seen = [{5, 288}]
+  time = 4000      db updates done = [{1, 288}, {2, 288}, {3, 288}, {4, 288}, {5, 289}, {6, 288}, {7, 288}]
+
+  time = 5000 client requests seen = [{5, 316}]
+  time = 5000      db updates done = [{1, 316}, {2, 316}, {3, 316}, {4, 316}, {5, 318}, {6, 316}, {7, 316}]
+
+  time = 6000 client requests seen = [{5, 343}]
+  time = 6000      db updates done = [{1, 343}, {2, 343}, {3, 343}, {4, 343}, {5, 343}, {6, 343}, {7, 343}]
+
+  time = 7000 client requests seen = [{5, 366}]
+  time = 7000      db updates done = [{1, 366}, {2, 366}, {3, 366}, {4, 366}, {5, 368}, {6, 366}, {7, 366}]
+
+  time = 8000 client requests seen = [{5, 386}]
+  time = 8000      db updates done = [{1, 386}, {2, 386}, {3, 386}, {4, 386}, {5, 387}, {6, 386}, {7, 386}]
+
+  time = 9000 client requests seen = [{5, 406}]
+  time = 9000      db updates done = [{1, 406}, {2, 406}, {3, 406}, {4, 406}, {5, 407}, {6, 406}, {7, 406}]
+
+  time = 10000 client requests seen = [{5, 423}]
+  time = 10000      db updates done = [{1, 423}, {2, 423}, {3, 423}, {4, 423}, {5, 423}, {6, 423}, {7, 423}]
+
+  time = 11000 client requests seen = [{5, 441}]
+  time = 11000      db updates done = [{1, 441}, {2, 441}, {3, 441}, {4, 441}, {5, 442}, {6, 441}, {7, 441}]
+
+  time = 12000 client requests seen = [{5, 457}]
+  time = 12000      db updates done = [{1, 457}, {2, 457}, {3, 457}, {4, 457}, {5, 458}, {6, 457}, {7, 457}]
+
+  time = 13000 client requests seen = [{5, 467}]
+  time = 13000      db updates done = [{1, 466}, {2, 466}, {3, 467}, {4, 467}, {5, 468}, {6, 467}, {7, 467}]
+
+  time = 14000 client requests seen = [{5, 467}]
+  time = 14000      db updates done = [{1, 466}, {2, 466}, {3, 467}, {4, 467}, {5, 468}, {6, 467}, {7, 467}]
+
+  time = 15000 client requests seen = [{5, 467}]
+  time = 15000      db updates done = [{1, 466}, {2, 466}, {3, 467}, {4, 467}, {5, 468}, {6, 467}, {7, 467}]
+
+-------------------------------------------------------------------
+  Parameters:
+- server                    : 6
+- client                    : 5
+- max_client_requests       : 5000,      
+- client_request_interval   : 1,        
+- client_reply_timeout      : 10 
+-------------------------------------------------------------------
+  time = 1000 client requests seen = [{5, 169}]
+  time = 1000      db updates done = [{1, 169}, {2, 169}, {3, 169}, {4, 169}, {5, 170}, {6, 169}]
+
+  time = 2000 client requests seen = [{5, 224}]
+  time = 2000      db updates done = [{1, 224}, {2, 224}, {3, 224}, {4, 224}, {5, 226}, {6, 224}]
+
+  time = 3000 client requests seen = [{5, 253}]
+  time = 3000      db updates done = [{1, 253}, {2, 253}, {3, 253}, {4, 253}, {5, 255}, {6, 253}]
+
+  time = 4000 client requests seen = [{5, 276}]
+  time = 4000      db updates done = [{1, 276}, {2, 276}, {3, 276}, {4, 276}, {5, 278}, {6, 276}]
+
+  time = 5000 client requests seen = [{5, 306}]
+  time = 5000      db updates done = [{1, 306}, {2, 306}, {3, 306}, {4, 306}, {5, 308}, {6, 306}]
+
+  time = 6000 client requests seen = [{5, 335}]
+  time = 6000      db updates done = [{1, 335}, {2, 335}, {3, 335}, {4, 335}, {5, 338}, {6, 335}]
+
+  time = 7000 client requests seen = [{5, 355}]
+  time = 7000      db updates done = [{1, 355}, {2, 355}, {3, 355}, {4, 355}, {5, 357}, {6, 355}]
+
+  time = 8000 client requests seen = [{5, 380}]
+  time = 8000      db updates done = [{1, 380}, {2, 380}, {3, 380}, {4, 380}, {5, 382}, {6, 380}]
+
+  time = 9000 client requests seen = [{5, 402}]
+  time = 9000      db updates done = [{1, 402}, {2, 402}, {3, 402}, {4, 402}, {5, 404}, {6, 402}]
+
+  time = 10000 client requests seen = [{5, 424}]
+  time = 10000      db updates done = [{1, 424}, {2, 424}, {3, 424}, {4, 424}, {5, 427}, {6, 424}]
+
+  time = 11000 client requests seen = [{5, 439}]
+  time = 11000      db updates done = [{1, 439}, {2, 439}, {3, 439}, {4, 439}, {5, 440}, {6, 439}]
+
+  time = 12000 client requests seen = [{5, 453}]
+  time = 12000      db updates done = [{1, 453}, {2, 453}, {3, 453}, {4, 453}, {5, 454}, {6, 453}]
+
+  time = 13000 client requests seen = [{5, 461}]
+  time = 13000      db updates done = [{1, 461}, {2, 461}, {3, 461}, {4, 461}, {5, 463}, {6, 461}]
+
+  time = 14000 client requests seen = [{5, 465}]
+  time = 14000      db updates done = [{1, 461}, {2, 461}, {3, 462}, {4, 463}, {5, 465}, {6, 464}]
+
+  time = 15000 client requests seen = [{5, 465}]
+  time = 15000      db updates done = [{1, 461}, {2, 461}, {3, 462}, {4, 463}, {5, 465}, {6, 464}]
+
+  time = 16000 client requests seen = [{5, 465}]
+  time = 16000      db updates done = [{1, 461}, {2, 461}, {3, 462}, {4, 463}, {5, 465}, {6, 464}]
+
+  -------------------------------------------------------------------
+  Parameters:
+- server                    : 5
+- client                    : 5
+- max_client_requests       : 5000,      
+- client_request_interval   : 1,        
+- client_reply_timeout      : 10 
+-------------------------------------------------------------------
+  time = 1000 client requests seen = [{4, 145}]
+  time = 1000      db updates done = [{1, 146}, {2, 146}, {3, 146}, {4, 147}, {5, 146}]
+
+  time = 2000 client requests seen = [{4, 230}]
+  time = 2000      db updates done = [{1, 230}, {2, 230}, {3, 230}, {4, 232}, {5, 230}]
+
+  time = 3000 client requests seen = [{4, 287}]
+  time = 3000      db updates done = [{1, 287}, {2, 287}, {3, 287}, {4, 289}, {5, 287}]
+
+  time = 4000 client requests seen = [{4, 325}]
+  time = 4000      db updates done = [{1, 325}, {2, 325}, {3, 325}, {4, 327}, {5, 325}]
+
+  time = 5000 client requests seen = [{4, 364}]
+  time = 5000      db updates done = [{1, 364}, {2, 364}, {3, 364}, {4, 365}, {5, 364}]
+
+  time = 6000 client requests seen = [{4, 395}]
+  time = 6000      db updates done = [{1, 395}, {2, 395}, {3, 395}, {4, 396}, {5, 395}]
+
+  time = 7000 client requests seen = [{4, 424}]
+  time = 7000      db updates done = [{1, 424}, {2, 424}, {3, 424}, {4, 425}, {5, 424}]
+
+  time = 8000 client requests seen = [{4, 447}]
+  time = 8000      db updates done = [{1, 447}, {2, 447}, {3, 447}, {4, 449}, {5, 447}]
+
+  time = 9000 client requests seen = [{4, 472}]
+  time = 9000      db updates done = [{1, 472}, {2, 472}, {3, 472}, {4, 474}, {5, 472}]
+
+  time = 10000 client requests seen = [{4, 496}]
+  time = 10000      db updates done = [{1, 496}, {2, 496}, {3, 496}, {4, 498}, {5, 496}]
+
+  time = 11000 client requests seen = [{4, 516}]
+  time = 11000      db updates done = [{1, 516}, {2, 516}, {3, 516}, {4, 518}, {5, 516}]
+
+  time = 12000 client requests seen = [{4, 537}]
+  time = 12000      db updates done = [{1, 537}, {2, 537}, {3, 537}, {4, 538}, {5, 537}]
+
+  time = 13000 client requests seen = [{4, 555}]
+  time = 13000      db updates done = [{1, 553}, {2, 555}, {3, 555}, {4, 557}, {5, 555}]
+
+  time = 14000 client requests seen = [{4, 560}]
+  time = 14000      db updates done = [{1, 553}, {2, 555}, {3, 560}, {4, 561}, {5, 560}]
+
+  time = 15000 client requests seen = [{4, 560}]
+  time = 15000      db updates done = [{1, 553}, {2, 555}, {3, 560}, {4, 561}, {5, 560}]
