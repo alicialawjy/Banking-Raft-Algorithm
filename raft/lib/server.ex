@@ -1,5 +1,5 @@
 
-# distributed algorithms, n.dulay, 8 feb 2022
+# distributed algorithms, Alicia Law and Ye Liu, 19 Feb 2022
 # coursework, raft consensus, v2
 
 defmodule Server do
@@ -15,8 +15,7 @@ def start(config, server_num) do
 
   receive do
   { :BIND, servers, databaseP } ->
-    s = State.initialise(config, server_num, servers, databaseP) # server_num: own number, servers: all the servers, databaseP: the system db
-    # IO.inspect(s, label: "before timer")
+    s = State.initialise(config, server_num, servers, databaseP)
     s |> Timer.restart_election_timer()
       |> Server.next()
   end # receive
@@ -24,119 +23,119 @@ end # start
 
 # _________________________________________________________ next()
 def next(s) do
-  # s = s |> Server.execute_committed_entries()
-  # IO.inspect(s, label: "At the start of next()")
-  curr_term = s.curr_term                          # used to discard old messages
-  # curr_election = s.curr_election                  # used to discard old election timeouts
+  curr_term = s.curr_term    # server's current term
 
   s = receive do
+  # ------------------------------------------------------- #
+  # ---------------- VOTE-RELATED MESSAGES ---------------- #
+  # ------------------------------------------------------- #
 
-  # ---------------- VOTE-RELATED MESSAGES ------------------
-  # (i) When election timer runs out
-  # From: Self {Follower, Candidate} >> To: Self
-  # If
-  { :ELECTION_TIMEOUT, mterm, melection } = msg when mterm < curr_term ->
-    IO.puts("Server #{s.server_num} received old election timeout. mterm = #{mterm} curr_term = #{curr_term}")
-    # s |> Debug.received("Server #{s.server_num} received old election timeout. mterm = #{mterm} curr_term = #{curr_term}")
+  # ________________ I. ELECTION TIMEOUT __________________ #
+  # From: Self (Follower/Candidate)  >> To: Self (Follower/Candidate)
+  # Description: when election timer runs out
+  # Message variables: mterm - the curr_term during which the election timeout happened
+
+  # If the election timeout message was from an old termn, ignore:
+  { :ELECTION_TIMEOUT, mterm, _melection } = msg when mterm < curr_term ->
+    IO.puts("Server #{s.server_num} ignored old election timeout: message term = #{mterm} but curr_term = #{curr_term}")
     s
 
-  { :ELECTION_TIMEOUT, mterm, melection } = msg when (s.role != :LEADER) -> # equal or larger than curr_term
+  # Otherwise (mterm > curr_term) and if message sent to Follower/Candidate (not Leader), process it:
+  { :ELECTION_TIMEOUT, mterm, _melection } = msg when (s.role != :LEADER) ->
     IO.puts("Server #{s.server_num} Election Timeout - START")
-    s = s
-      |> Debug.received("-etim", msg)
-      |> Vote.receive_election_timeout()
+    s = s |> Vote.receive_election_timeout()
 
-    # IO.inspect(s, label: "s after election timeout finished - in server.ex")
-    s
-  # ________________________________________________________
-  # (ii) When follower received vote request from candidate
-  # If candidate term is lower, do not vote
-  { :VOTE_REQUEST, [candidate_curr_term, candidate_num, _candidate_id, candidateLastLogTerm, candidateLastLogIndex] } when candidate_curr_term < curr_term ->
+
+  # _________________ II. VOTE REQUEST ____________________ #
+  # From: Candidate >> To: Follower
+  # Description: when received vote request from candidate.
+  # Message variables: see description in Vote.receive_vote_request_from_candidate
+
+  # If Candidate's term is lower, do not vote. Ignore:
+  { :VOTE_REQUEST, [candidate_curr_term, candidate_num, _candidate_id, _candidateLastLogTerm, _candidateLastLogIndex] } when candidate_curr_term < curr_term ->
     IO.puts("Server #{s.server_num} received vote req from Server #{candidate_num} but did not vote")
     s
 
-  # If candidate term >= ours, process:
-  { :VOTE_REQUEST, [candidate_curr_term, candidate_num, candidate_id, candidateLastLogTerm, candidateLastLogIndex] } = msg ->
-    s = s
-      |> Debug.message("-vreq", msg)
-      |> Vote.receive_vote_request_from_candidate(candidate_curr_term, candidate_num, candidate_id, candidateLastLogTerm, candidateLastLogIndex)
+  # Otherwise, consider the candidate:
+  { :VOTE_REQUEST, [candidate_curr_term, candidate_num, candidate_id, candidateLastLogTerm, candidateLastLogIndex] } ->
+    s = s |> Vote.receive_vote_request_from_candidate(candidate_curr_term, candidate_num, candidate_id, candidateLastLogTerm, candidateLastLogIndex)
 
-    # IO.inspect(s, label: "s #{s.server_num} after receive_vote_request_from_candidate #{candidate_num} finished - in server.ex")
-    s
-  # ________________________________________________________
-  # (iii) When candidate received a vote reply from a follower
-  # follower_curr_term: the election term that the follower voted in.
+
+  # ____________________ III. VOTE REPLY ____________________ #
+  # From: Follower >> To: Candidate
+  # Description: when received a vote reply from followers.
+  # Message variables:
+  #   - follower_num       : follower's server_num
+  #   - follower_curr_term : follower's current term
 
   # If the vote reply was for an old election, discard:
   { :VOTE_REPLY, follower_num, follower_curr_term } when follower_curr_term < curr_term ->
-    IO.puts("Outdated Vote Reply from Server #{follower_num} to Server #{s.server_num}")
-    # Debug.received("Discard Reply to old Vote Request #{inspect msg}")
+    IO.puts("Old Vote Reply from Server #{follower_num} to Server #{s.server_num}. Ignored.")
     s
 
-  # If the server is still a candidate and vote reply is for this term's election, accept:
-  { :VOTE_REPLY, follower_num, follower_curr_term } = msg when s.role == :CANDIDATE -> #when follower_curr_term == curr_term
+  # Else if, the server is still a candidate and vote reply is for this term's election, accept:
+  { :VOTE_REPLY, follower_num, follower_curr_term } = msg when s.role == :CANDIDATE ->
+    IO.puts("Server #{s.server_num} received Server #{follower_num}'s vote reply. Processing.")
     s = s
       |> Debug.message("-vrep", msg)
       |> Vote.receive_vote_reply_from_follower(follower_num, follower_curr_term)
-    s
-  # If server steped down/ is already a leader, ignore:
+
+  # Else, server is no longer a Candidate (either Follower/Leader), ignore:
   { :VOTE_REPLY, follower_num, follower_curr_term } ->
-    IO.puts("Ignoring Vote Reply from Server #{follower_num} to Server #{s.server_num}")
-    # Debug.received("Discard Reply to old Vote Request #{inspect msg}")
+    IO.puts("#{s.role} Server #{follower_num} received Server #{s.server_num} vote reply. Ignored.")
     s
 
-    # IO.inspect(s, label: "s after receive_vote_reply_from_follower finished - in server.ex")
-    # s
+    # __________________ IV. LEADER ELECTED ____________________ #
+    # From: New Leader >> To: Candidate/ Follower
+    # Description: received when a new leader has been elected.
+    # Message variables:
+    #   - leaderP          : leader's <PID>
+    #   - leader_curr_term : leader's current term
 
-    # ________________________________________________________
-    # (iv) When a leader is elected
+    # Run to test 1 round of election.
     # {:LEADER_ELECTED, _candidate_num, candidate_curr_term} ->
     #   IO.puts("leader message received")
     #   Process.exit(s.selfP, :kill)
 
+    # If it is a old leader elected message, ignore.
     {:LEADER_ELECTED, _leaderP, leader_curr_term} when leader_curr_term < curr_term ->
-      IO.puts("Old leader message. Discard message.")
+      IO.puts("Old leader message (From term #{leader_curr_term}, Now term #{curr_term}). Discard message.")
       s
 
-    {:LEADER_ELECTED, leaderP, leader_curr_term} -> # when candidate_curr_term == curr_term
+    # Otherwise, process new leader.
+    {:LEADER_ELECTED, leaderP, leader_curr_term} ->
       s = s |> Vote.receive_leader(leaderP, leader_curr_term)
       s
 
 
+  # ------------------------------------------------------- #
+  # ---------------- APPEND-ENTRIES MESSAGES -------------- #
+  # ------------------------------------------------------- #
 
-  # ---------------- APPEND-ENTRIES MESSAGES ------------------
-  # If receive heartbeat, aka an empty append entries request
-  # From: Leader --> To: Candidate
+  # ______________ I. APPEND-ENTRIES REQUEST ______________ #
+  # From: Leader --> To: Followers
+  # Description: received aeRequest from leader
+  # Message Variables:
+  #   - leaderTerm    : leader's curr_term
+  #   - commitIndex   : leader's commitIndex
+  #   - prevIndex     : the index where leader and follower's logs coincide
+  #   - prevTerm      : the log's term at prevIndex
+  #   - leaderEntries : the leader's logs from [prevIndex + 1 .. end]
+
+  # Heartbeat
   { :APPEND_ENTRIES_REQUEST, leaderTerm, commitIndex } ->
-    # IO.puts("Received heartbeat, Server #{s.server_num} restarting timer - Line 111 server.ex")
+    IO.puts("Server #{s.server_num} received heartbeat, restarting timer - Line 125 server.ex")
     s = s |> Timer.restart_election_timer()
     s
 
+  # New Append Entries Request
   { :APPEND_ENTRIES_REQUEST, leaderTerm, prevIndex, prevTerm, leaderEntries, commitIndex} ->
-    IO.puts("Received aeReq from leader, processing - Line 116 server.ex")
-    # IO.inspect(s, label: "server.ex Line 117")
+    IO.puts("Server #{s.server_num} received aeReq from leader, processing - Line 130 server.ex")
     s = AppendEntries.receive_append_entries_request(s, leaderTerm, prevIndex, prevTerm, leaderEntries, commitIndex)
     s
 
-    # { :APPEND_ENTRIES_REQUEST, leaderTerm, prevIndex, prevTerm, leaderEntries, commitIndex} when s.role == :LEADER->
-    #   IO.puts("Leader received aeReq from leader, processing - Line 122 server.ex")
-    #   # IO.inspect(s, label: "server.ex Line 117")
-    #   s
 
-
-  # { :APPEND_ENTRIES_REQUEST, client_msg, leader_term } ->
-  #   s = AppendEntries.receive_append_entries_request(s, client_msg, leader_term)
-
-  # # If the receiver's term < curr_term, do not append
-  # { :APPEND_ENTRIES_REQUEST, mterm, m } when mterm < curr_term -> # Reject send Success=false and newer term in reply
-  #   s = s |> Debug.message("-areq", "stale #{mterm} #{inspect m}")
-  #         |> AppendEntries.send_entries_reply_to_leader(m.leaderP, false)
-
-#   # ________________________________________________________
-#   { _mtype, mterm, _m } = msg when mterm < curr_term ->     # Discard any other stale messages
-#     s |> Debug.received("stale #{inspect msg}")
-
-  # ________________________________________________________
+  # ______________ II. APPEND-ENTRIES REPLY ______________ #
   # If leader
   {:APPEND_ENTRIES_REPLY, followerP, followerTerm, success, followerLastIndex} when s.role == :LEADER ->
     IO.puts('Leader #{s.server_num} received aeReply')
@@ -159,7 +158,7 @@ def next(s) do
 #       |> AppendEntries.receive_append_entries_reply_from_follower(mterm, m)
 
 
-  # ________________________________________________________
+  # ______________ III. APPEND-ENTRIES TIMEOUT ______________ #
   { :APPEND_ENTRIES_TIMEOUT, term, followerP } = msg ->   # Leader >> Leader
     s = if s.role == :LEADER && term == curr_term do
       # IO.puts("Leader received aeTimeout")
@@ -173,7 +172,10 @@ def next(s) do
 
     s
 
-  # ________________________________________________________
+  # ------------------------------------------------------- #
+  # ------------------- CLIENT REQUESTS ------------------- #
+  # ------------------------------------------------------- #
+
   { :CLIENT_REQUEST, m } = msg when s.role == :LEADER ->                  # Client >> Leader
     s = s
       |> Debug.message("-creq", msg)
@@ -185,6 +187,9 @@ def next(s) do
    #  send m.clientP, {:CLIENT_REPLY, m.cid, :NOT_LEADER, s.leaderP}
     s
 
+  # ------------------------------------------------------- #
+  # --------------------- DB MESSAGES --------------------- #
+  # ------------------------------------------------------- #
   { :DB_REPLY, _result, db_seqnum, client_request } when s.role == :LEADER ->     # DB Replication successful for leader
     s = ClientReq.receive_reply_from_db(s, db_seqnum, client_request)
     IO.puts("Database replicated log #{inspect (client_request)}")
@@ -214,6 +219,9 @@ def next(s) do
   #   IO.puts("Database did not replicate log #{db_seqnum}.")
   #   s
 
+  # ------------------------------------------------------- #
+  # ---------------------- UNEXPECTED --------------------- #
+  # ------------------------------------------------------- #
     unexpected ->
       Helper.node_halt("************* Server: unexpected message #{inspect unexpected}")
 
@@ -221,15 +229,5 @@ def next(s) do
 
   Server.next(s)
 end # next
-
-
-
-# """  Omitted
-# def follower_if_higher(s, mterm) do
-# def become_follower(s, mterm) do
-# def become_candidate(s) do
-# def become_leader(s) do
-# def execute_committed_entries(s) do
-# """
 
 end # Server
