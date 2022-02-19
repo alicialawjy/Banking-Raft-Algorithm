@@ -11,8 +11,8 @@ def receive_request_from_client(leader, m) do
   status = check_req_status(leader, m.cid)
 
   if status == :APPLIED_REQ do
-    send m.clientP, { :CLIENT_REPLY, m.cid, m, leader.selfP }
-    IO.puts("received applied request #{inspect m} from client, just reply.")
+    send m.clientP, { :CLIENT_REPLY, m.cid, m, leader.selfP, leader.server_num }
+    # #IO.puts("received applied request #{inspect m} from client, just reply.")
     leader
   end
 
@@ -20,7 +20,8 @@ def receive_request_from_client(leader, m) do
   leader = if status == :NEW_REQ do
     leader = Log.append_entry(leader, %{request: m, term: leader.curr_term})
     leader = State.commit_index(leader, Log.last_index(leader))                 # update the commit index for in the logs
-    IO.inspect(leader.log, label: "line 22 Received request from client. Leader log:")
+    #IO.puts ("Leader log length: #{Log.last_index(leader)}")
+    # IO.inspect(leader.log, label: "line 22 Received request from client. Leader log:")
     leader
   else
     leader
@@ -41,10 +42,10 @@ end
 
 def receive_reply_from_db(leader, db_seqnum, client_request) do
   leader = leader |> State.last_applied(db_seqnum)
-  # IO.puts "db_seqnum: #{db_seqnum}"
-  # IO.puts "leader last_applied after receive_reply_from_db #{leader.last_applied}"
-  IO.puts "leader send client_request #{inspect(client_request.cid)} #{inspect(client_request)} to client #{}"
-  send client_request.clientP, { :CLIENT_REPLY, client_request.cid, client_request, leader.selfP }
+  # #IO.puts "db_seqnum: #{db_seqnum}"
+  # #IO.puts "leader last_applied after receive_reply_from_db #{leader.last_applied}"
+  #IO.puts "Leader #{leader.server_num} send client_request #{inspect(client_request.cid)} #{inspect(client_request)} to client #{inspect client_request.clientP}"
+  send client_request.clientP, { :CLIENT_REPLY, client_request.cid, client_request, leader.selfP, leader.server_num }
 
   for followerP <- leader.servers do
     send followerP, {:COMMIT_ENTRIES_REQUEST, db_seqnum}
@@ -61,7 +62,7 @@ def check_req_status(leader, cid) do
   appliedLog = Map.take(leader.log, Enum.to_list(1..leader.last_applied))
   applied_cid = for {k,v} <- appliedLog, do: v.request.cid
 
-  IO.puts("committed_cid: #{inspect(committed_cid)}, applied_cid: #{inspect(applied_cid)}")
+  # #IO.puts("committed_cid: #{inspect(committed_cid)}, applied_cid: #{inspect(applied_cid)}")
   status = cond do
     # If log is empty, definitely a new request
     Log.last_index(leader) == 0 ->

@@ -8,13 +8,14 @@ defmodule AppendEntries do
 
   def send_entries_to_followers(leader, followerP) do
     if leader.next_index[followerP] < (Log.last_index(leader) + 1) do
-      # IO.puts "CURRENT LOG LENGTH: #{map_size(leader.log)}"
+
+      # #IO.puts "CURRENT LOG LENGTH: #{map_size(leader.log)}"
 
       followerPrevIndex = leader.next_index[followerP] - 1                              # follower's the next_index (where to start the entry)
       entries = Log.get_entries(leader, (followerPrevIndex+1)..Log.last_index(leader))  # entries
       prevTerm = Log.term_at(leader, followerPrevIndex)
 
-      # IO.puts("Line 24 - APPEND_ENTIRES_REQ contains following: followerPrevIndex: #{followerPrevIndex}, entries: #{inspect entries}, prevTerm: #{prevTerm} ")
+      # #IO.puts("Line 24 - APPEND_ENTIRES_REQ contains following: followerPrevIndex: #{followerPrevIndex}, entries: #{inspect entries}, prevTerm: #{prevTerm} ")
       Timer.restart_append_entries_timer(leader,followerP)
       send followerP, { :APPEND_ENTRIES_REQUEST, leader.curr_term, followerPrevIndex, prevTerm, entries, leader.commit_index}
       # IO.inspect(leader, label: "leader #{leader.server_num} after sending entries to #{inspect(followerP)}")
@@ -22,7 +23,7 @@ defmodule AppendEntries do
     else # if follower is already up-to-date, just send heartbeats
       Timer.restart_append_entries_timer(leader,followerP)
       send followerP, { :APPEND_ENTRIES_REQUEST, leader.curr_term, leader.commit_index }
-      # IO.puts("Followers are up-to-date. Sending heartbeats.")
+      # #IO.puts("Followers are up-to-date. Sending heartbeats.")
       leader
     end
     leader
@@ -31,7 +32,7 @@ defmodule AppendEntries do
   def receive_append_entries_request(s, leaderTerm, prevIndex, prevTerm, leaderEntries, commitIndex) do
     # (i) If I am a candidate/ leader but received an append entries request from someone with a larger term, stepdown:
     s = if s.role != :FOLLOWER && s.curr_term < leaderTerm do
-      IO.puts("Leader to stepdown as received aeReq from another leader of larger term - ae.ex Line 40")
+      #IO.puts("Server #{s.server_num} stepdown as received aeReq from another leader of larger term")
       s = Vote.stepdown(s, leaderTerm)
     else
       s
@@ -39,7 +40,8 @@ defmodule AppendEntries do
 
     # (ii) If my current term is larger than the leader's, reject leader
     if s.curr_term > leaderTerm do
-      IO.puts("Server #{s.server_num} rejecting aeReq from leader bec have a larger term - ae.ex Line 46")
+      # Process.sleep(20)
+      # #IO.puts("Server #{s.server_num} rejecting aeReq from leader bec have a larger term")
       send s.leaderP, {:APPEND_ENTRIES_REPLY, s.selfP, s.curr_term, false, nil}
     end # if
 
@@ -55,33 +57,19 @@ defmodule AppendEntries do
       end # if
 
     if s.curr_term == leaderTerm do
+      # Process.sleep(20)
       send s.leaderP, {:APPEND_ENTRIES_REPLY, s.selfP, s.curr_term, success, s.commit_index}
     end
 
     s
   end # receive_append_entries_request
 
-  # def storeEntries(s, prevIndex, entries, commitIndex) do
-  #   index = prevIndex
-  #   for j <- 1..map_size(request) do
-  #     index = index + 1
-  #     if Log.term_at(s, index) != Log.term_at(s, request[j]) do
-  #       Log.append_entries(s, request[j])
-  #     end
-  #   end
-  #   commitIndex = min(commitIndex, index)
-  #   index
-  # end
 
   def storeEntries(s, prevIndex, entries, commitIndex) do
-    # IO.inspect(s.log, label: "Server logs before storeEntries")
-    IO.puts("storeEntries variables: prevIndex=#{prevIndex}, entries=#{inspect(entries)}, commitIndex=#{commitIndex}}")
 
     # find the point in the entry to start appending - min of breakpoint
     breakPointList = for {index, v} <- entries do
-      # index = j
       if Log.last_index(s) >= index do
-        IO.puts("index:#{index}, log length: #{Log.last_index(s)}, ")
         if s.log[index].term != v.term do
           index
         else
@@ -91,10 +79,8 @@ defmodule AppendEntries do
         index
       end
     end
-    IO.puts("BreakpointLisr for Server #{s.server_num} = #{inspect breakPointList}")
 
     breakPoint = Enum.min(breakPointList)                 # the index where the server's log and entries start to diverge
-    IO.puts("Append from entries index: #{breakPoint}")
 
     entries = if breakPoint != nil do
       Map.drop(entries, Enum.to_list(0..(breakPoint-1)))  # clear the entries before breakPoint
@@ -106,7 +92,7 @@ defmodule AppendEntries do
     s = if breakPoint != nil && breakPoint < Log.last_index(s) do
       s = s|>
       Log.delete_entries_from(breakPoint)    # Delete entries from the point where diverge with leader
-      IO.inspect(s.log, label: "Server #{s.server_num}'s logs after delete_entries_from")
+      # IO.inspect(s.log, label: "Server #{s.server_num}'s logs after delete_entries_from")
       s
     else
       s
@@ -116,11 +102,10 @@ defmodule AppendEntries do
     s = if entries != %{} do
       s = Log.merge_entries(s, entries)                 # Append leader's entries
       s = State.commit_index(s, Log.last_index(s))      # Update commit index (for logs)
-      IO.inspect(s.log, label: "Server #{s.server_num}'s logs after storeEntries - Line 114")
-      IO.puts("Server #{s.server_num}'s commit index after storeEntries #{s.commit_index}")
+      # IO.inspect(s.log, label: "Server #{s.server_num}'s logs updated")
       s
     else
-      IO.puts("already updated. Server #{s.server_num}'s logs stay the same")
+      # #IO.puts("already updated. Server #{s.server_num}'s logs stay the same")
       s
     end
     s
@@ -132,15 +117,14 @@ defmodule AppendEntries do
    # Update leader's next_index tracker with follower
    s = if success do
       s = State.next_index(s, followerP, followerLastIndex+1)
-      IO.puts("SUCCESSFUL aeReply - ae.ex Line 97. ")
+      # #IO.puts("SUCCESSFUL aeReply - ae.ex Line 97. ")
       s
    else
       s = State.next_index(s, followerP, max(s.next_index[followerP]-1, 1))
       send_entries_to_followers(s, followerP)
-      IO.puts("FAILED aeReply - ae.ex Line 97. ")
+      # #IO.puts("FAILED aeReply - ae.ex Line 97. ")
       s
    end
-   IO.inspect(s.next_index, label: "next_index after aeReply Line 102")
 
    # Check if majority has committed to log
 
@@ -156,16 +140,13 @@ defmodule AppendEntries do
     end)}
    end
 
-  #  IO.inspect(counter, label: "counter Line 155")
-  #  IO.puts "s.log: #{inspect(s.log)} Line 156"
-
    for {index, c} <- counter do
-    # IO.puts "checking count #{c} and majority #{s.majority}"
+    # #IO.puts "checking count #{c} and majority #{s.majority}"
     if c >= s.majority do
-      IO.puts "leader got majority reply, sending request #{index} to database"
+      # #IO.puts "Leader #{s.server_num} got majority reply, sending request #{index} to database"
       send s.databaseP, {:DB_REQUEST, Log.request_at(s, index), index} # send the database the request
     else
-      IO.puts "do not commit request #{index}"
+      # #IO.puts "do not commit request #{index}"
     end
    end
 

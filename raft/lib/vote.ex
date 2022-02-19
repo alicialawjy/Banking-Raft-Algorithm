@@ -11,7 +11,7 @@ def receive_election_timeout(s) do
   # s - A Follower/ Candidate server that timed out (never a Leader).
 
   # (i) Run for candidate
-  IO.puts("Server #{s.server_num} runs for candidate")
+  #IO.puts("Server #{s.server_num} runs for candidate in term #{s.curr_term+1}")
   s = s
     |> State.role(:CANDIDATE)               # Change role to candidate
     |> State.inc_term()                     # Increment current term
@@ -44,7 +44,7 @@ def receive_vote_request_from_candidate(follower, candidate_curr_term, candidate
   # (i) Stepdown if candidate term is greater
   follower = if candidate_curr_term > follower.curr_term do
     follower = stepdown(follower, candidate_curr_term)
-    IO.puts("Server #{follower.server_num} stepdown at vote request - vote.ex Line 47")
+    #IO.puts("Server #{follower.server_num} stepdown at receiving vote request")
     follower
   else
     follower
@@ -68,7 +68,7 @@ def receive_vote_request_from_candidate(follower, candidate_curr_term, candidate
   # (iii) Send vote reply to candidate if voted for them
   if follower.voted_for == candidate_num do
     send candidate_id, {:VOTE_REPLY, follower.server_num, follower.curr_term}
-    IO.puts("Server #{follower.server_num} voted for Server #{candidate_num} - vote.ex Line 71")
+    #IO.puts("Server #{follower.server_num} voted for Server #{candidate_num} in term #{follower.curr_term}")
   end
 
   follower # return
@@ -84,7 +84,7 @@ def receive_vote_reply_from_follower(candidate, follower_num, follower_curr_term
   # (i) Stepdown if follower's term is larger
   candidate = if candidate.curr_term < follower_curr_term do
     stepdown(candidate, follower_curr_term)
-    IO.puts("Candidate #{candidate.server_num} stepdown at vote reply - vote.ex Line 87")
+    #IO.puts("Candidate #{candidate.server_num} stepdown at vote reply")
     candidate
   else
     candidate
@@ -92,7 +92,7 @@ def receive_vote_reply_from_follower(candidate, follower_num, follower_curr_term
 
   # (ii) If candidate.curr_term == follower.curr_term, add voter into add_to_voted_by list
   candidate = if candidate.curr_term == follower_curr_term do
-    IO.puts("Processed vote from Server #{follower_num} for Server #{candidate.server_num}")
+    # #IO.puts("Processed vote from Server #{follower_num} for Server #{candidate.server_num}")
     candidate |> State.add_to_voted_by(follower_num)
   else
     candidate
@@ -101,8 +101,9 @@ def receive_vote_reply_from_follower(candidate, follower_num, follower_curr_term
   # (iii) Check if majority reached. If yes, become leader
   candidate = if State.vote_tally(candidate) >= candidate.majority do
     candidate = become_leader(candidate)
-    IO.puts("New leader elected! Server #{candidate.server_num} is leader for Term #{candidate.curr_term}")
-    IO.inspect(candidate, label: "New leader")
+    #IO.puts("New leader elected! Server #{candidate.server_num} is leader for Term #{candidate.curr_term}")
+    # #IO.puts("Leader #{candidate.server_num} got votes from #{inspect candidate.voted_by}")
+    # IO.inspect(candidate.log, label: "New leader's log")
     candidate
   else
     candidate

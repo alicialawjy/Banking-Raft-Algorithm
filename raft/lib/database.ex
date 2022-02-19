@@ -44,7 +44,7 @@ def next(d) do
       |> Database.next()
 
   { :DB_REQUEST, client_request, logIndex} ->
-    # IO.puts "database receive #{logIndex} #{d.seqnum}, do not process"
+    # #IO.puts "database receive #{logIndex} #{d.seqnum}, do not process"
     d |> Database.next()
 
   unexpected ->
@@ -54,7 +54,7 @@ end # next
 
 def send_reply_to_server(d, db_result, seqnum,client_request) do
   send d.serverP, { :DB_REPLY, db_result, seqnum, client_request}
-  # IO.puts "send_reply_to_server #{seqnum} line 56"
+  # #IO.puts "send_reply_to_server #{seqnum} line 56"
   d
 end # send_reply_to_server
 

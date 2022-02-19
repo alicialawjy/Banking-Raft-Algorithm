@@ -84,22 +84,23 @@ end # send_client_request_to_leader
 # _________________________________________________________ receive_reply_from_leader()
 def receive_reply_from_leader(c, cid) do
   receive do
-  { :CLIENT_REPLY, m_cid, :NOT_LEADER, leaderP } when m_cid == cid ->
+  { :CLIENT_REPLY, m_cid, :NOT_LEADER, leaderP, leader_num} when m_cid == cid ->
     Process.sleep(200)
     c |> Client.leaderP(leaderP)
       |> Client.send_client_request_receive_reply(cid)
 
-  { :CLIENT_REPLY, m_cid, reply, leaderP } when m_cid == cid ->
-    IO.puts("client receive #{inspect(m_cid)} reply from leader")
+  { :CLIENT_REPLY, m_cid, reply, leaderP, leader_num } when m_cid == cid ->
+    #IO.puts("Client receive #{inspect(m_cid)} reply from leader")
     c = c
       |> Client.result(reply)
       |> Client.leaderP(leaderP)
-    IO.puts("c.leaderP: #{inspect(c.leaderP)}")
-    IO.inspect(c.result, label: "client result")
+      |> Monitor.send_msg({ :CLIENT_REQUEST, leader_num })
+
+    # IO.inspect(c.result, label: "client result")
     c
 
-  { :CLIENT_REPLY, m_cid, _reply, _leaderP } when m_cid < cid ->
-    IO.puts("client receive old #{inspect(m_cid)} #{inspect(cid)} reply from leader")
+  { :CLIENT_REPLY, m_cid, _reply, _leaderP, _leaderNum } when m_cid < cid ->
+    # #IO.puts("client receive old #{inspect(m_cid)} #{inspect(cid)} reply from leader")
     c |> Client.receive_reply_from_leader(cid)
 
   { :CLIENT_TIMELIMIT } ->

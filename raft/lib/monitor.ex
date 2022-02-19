@@ -52,7 +52,7 @@ def next(m) do
     moves =
       case Map.get(m.moves, seqnum) do
       nil ->
-        # IO.puts "db #{db} seq #{seqnum} = #{done+1}"
+        #IO.puts "db #{db} seq #{seqnum} = #{done+1}"
         Map.put m.moves, seqnum, %{ amount: amount, from: from, to: to }
 
       t -> # already logged - check command
