@@ -1,0 +1,778 @@
+Parameters:
+- server                    : 3
+- client                    : 3
+- max_client_requests       : 3,      
+- client_request_interval   : 5,        
+- client_reply_timeout      : 50 
+
+-------------------------------------------------------------------
+Before processing request. Leader 3 log: %{}
+After processing request. Leader 3log: %{
+  1 => %{
+    request: %{
+      cid: {2, 1},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 276, 50, 34}
+    },
+    term: 1
+  }
+}
+Leader 3 received client request %{cid: {2, 1}, clientP: #PID<18524.146.0>, cmd: {:MOVE, 276, 50, 34}}
+Before processing request. Leader 3 log: %{
+  1 => %{
+    request: %{
+      cid: {2, 1},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 276, 50, 34}
+    },
+    term: 1
+  }
+}
+After processing request. Leader 3log: %{
+  1 => %{
+    request: %{
+      cid: {2, 1},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 276, 50, 34}
+    },
+    term: 1
+  },
+  2 => %{
+    request: %{
+      cid: {3, 1},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 532, 58, 69}
+    },
+    term: 1
+  }
+}
+Leader 3 received client request %{cid: {3, 1}, clientP: #PID<18522.147.0>, cmd: {:MOVE, 532, 58, 69}}
+Before processing request. Leader 3 log: %{
+  1 => %{
+    request: %{
+      cid: {2, 1},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 276, 50, 34}
+    },
+    term: 1
+  },
+  2 => %{
+    request: %{
+      cid: {3, 1},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 532, 58, 69}
+    },
+    term: 1
+  }
+}
+After processing request. Leader 3log: %{
+  1 => %{
+    request: %{
+      cid: {2, 1},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 276, 50, 34}
+    },
+    term: 1
+  },
+  2 => %{
+    request: %{
+      cid: {3, 1},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 532, 58, 69}
+    },
+    term: 1
+  },
+  3 => %{
+    request: %{
+      cid: {1, 1},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 863, 21, 6}
+    },
+    term: 1
+  }
+}
+Leader 3 received client request %{cid: {1, 1}, clientP: #PID<18523.147.0>, cmd: {:MOVE, 863, 21, 6}}
+Leader 3 reply client request %{cid: {2, 1}, clientP: #PID<18524.146.0>, cmd: {:MOVE, 276, 50, 34}}
+Leader 3 reply client request %{cid: {3, 1}, clientP: #PID<18522.147.0>, cmd: {:MOVE, 532, 58, 69}}
+Leader 3 reply client request %{cid: {1, 1}, clientP: #PID<18523.147.0>, cmd: {:MOVE, 863, 21, 6}}
+Leader 3 received applied request %{cid: {3, 1}, clientP: #PID<18522.147.0>, cmd: {:MOVE, 532, 58, 69}} from client, just reply.
+Leader 3 received client request %{cid: {3, 1}, clientP: #PID<18522.147.0>, cmd: {:MOVE, 532, 58, 69}}
+Leader 3 received applied request %{cid: {1, 1}, clientP: #PID<18523.147.0>, cmd: {:MOVE, 863, 21, 6}} from client, just reply.
+Leader 3 received client request %{cid: {1, 1}, clientP: #PID<18523.147.0>, cmd: {:MOVE, 863, 21, 6}}
+Before processing request. Leader 3 log: %{
+  1 => %{
+    request: %{
+      cid: {2, 1},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 276, 50, 34}
+    },
+    term: 1
+  },
+  2 => %{
+    request: %{
+      cid: {3, 1},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 532, 58, 69}
+    },
+    term: 1
+  },
+  3 => %{
+    request: %{
+      cid: {1, 1},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 863, 21, 6}
+    },
+    term: 1
+  }
+}
+After processing request. Leader 3log: %{
+  1 => %{
+    request: %{
+      cid: {2, 1},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 276, 50, 34}
+    },
+    term: 1
+  },
+  2 => %{
+    request: %{
+      cid: {3, 1},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 532, 58, 69}
+    },
+    term: 1
+  },
+  3 => %{
+    request: %{
+      cid: {1, 1},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 863, 21, 6}
+    },
+    term: 1
+  },
+  4 => %{
+    request: %{
+      cid: {2, 2},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 810, 58, 11}
+    },
+    term: 1
+  }
+}
+Leader 3 received client request %{cid: {2, 2}, clientP: #PID<18524.146.0>, cmd: {:MOVE, 810, 58, 11}}
+Before processing request. Leader 3 log: %{
+  1 => %{
+    request: %{
+      cid: {2, 1},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 276, 50, 34}
+    },
+    term: 1
+  },
+  2 => %{
+    request: %{
+      cid: {3, 1},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 532, 58, 69}
+    },
+    term: 1
+  },
+  3 => %{
+    request: %{
+      cid: {1, 1},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 863, 21, 6}
+    },
+    term: 1
+  },
+  4 => %{
+    request: %{
+      cid: {2, 2},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 810, 58, 11}
+    },
+    term: 1
+  }
+}
+After processing request. Leader 3log: %{
+  1 => %{
+    request: %{
+      cid: {2, 1},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 276, 50, 34}
+    },
+    term: 1
+  },
+  2 => %{
+    request: %{
+      cid: {3, 1},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 532, 58, 69}
+    },
+    term: 1
+  },
+  3 => %{
+    request: %{
+      cid: {1, 1},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 863, 21, 6}
+    },
+    term: 1
+  },
+  4 => %{
+    request: %{
+      cid: {2, 2},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 810, 58, 11}
+    },
+    term: 1
+  },
+  5 => %{
+    request: %{
+      cid: {3, 2},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 533, 50, 100}
+    },
+    term: 1
+  }
+}
+Leader 3 received client request %{cid: {3, 2}, clientP: #PID<18522.147.0>, cmd: {:MOVE, 533, 50, 100}}
+Leader 3 received client request %{cid: {2, 2}, clientP: #PID<18524.146.0>, cmd: {:MOVE, 810, 58, 11}}
+Leader 3 reply client request %{cid: {2, 2}, clientP: #PID<18524.146.0>, cmd: {:MOVE, 810, 58, 11}}
+Leader 3 reply client request %{cid: {3, 2}, clientP: #PID<18522.147.0>, cmd: {:MOVE, 533, 50, 100}}
+Before processing request. Leader 3 log: %{
+  1 => %{
+    request: %{
+      cid: {2, 1},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 276, 50, 34}
+    },
+    term: 1
+  },
+  2 => %{
+    request: %{
+      cid: {3, 1},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 532, 58, 69}
+    },
+    term: 1
+  },
+  3 => %{
+    request: %{
+      cid: {1, 1},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 863, 21, 6}
+    },
+    term: 1
+  },
+  4 => %{
+    request: %{
+      cid: {2, 2},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 810, 58, 11}
+    },
+    term: 1
+  },
+  5 => %{
+    request: %{
+      cid: {3, 2},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 533, 50, 100}
+    },
+    term: 1
+  }
+}
+After processing request. Leader 3log: %{
+  1 => %{
+    request: %{
+      cid: {2, 1},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 276, 50, 34}
+    },
+    term: 1
+  },
+  2 => %{
+    request: %{
+      cid: {3, 1},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 532, 58, 69}
+    },
+    term: 1
+  },
+  3 => %{
+    request: %{
+      cid: {1, 1},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 863, 21, 6}
+    },
+    term: 1
+  },
+  4 => %{
+    request: %{
+      cid: {2, 2},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 810, 58, 11}
+    },
+    term: 1
+  },
+  5 => %{
+    request: %{
+      cid: {3, 2},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 533, 50, 100}
+    },
+    term: 1
+  },
+  6 => %{
+    request: %{
+      cid: {2, 3},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 248, 11, 85}
+    },
+    term: 1
+  }
+}
+Leader 3 received client request %{cid: {2, 3}, clientP: #PID<18524.146.0>, cmd: {:MOVE, 248, 11, 85}}
+Leader 3 reply client request %{cid: {2, 3}, clientP: #PID<18524.146.0>, cmd: {:MOVE, 248, 11, 85}}
+Leader 3 received applied request %{cid: {1, 1}, clientP: #PID<18523.147.0>, cmd: {:MOVE, 863, 21, 6}} from client, just reply.
+Leader 3 received client request %{cid: {1, 1}, clientP: #PID<18523.147.0>, cmd: {:MOVE, 863, 21, 6}}
+Before processing request. Leader 3 log: %{
+  1 => %{
+    request: %{
+      cid: {2, 1},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 276, 50, 34}
+    },
+    term: 1
+  },
+  2 => %{
+    request: %{
+      cid: {3, 1},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 532, 58, 69}
+    },
+    term: 1
+  },
+  3 => %{
+    request: %{
+      cid: {1, 1},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 863, 21, 6}
+    },
+    term: 1
+  },
+  4 => %{
+    request: %{
+      cid: {2, 2},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 810, 58, 11}
+    },
+    term: 1
+  },
+  5 => %{
+    request: %{
+      cid: {3, 2},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 533, 50, 100}
+    },
+    term: 1
+  },
+  6 => %{
+    request: %{
+      cid: {2, 3},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 248, 11, 85}
+    },
+    term: 1
+  }
+}
+After processing request. Leader 3log: %{
+  1 => %{
+    request: %{
+      cid: {2, 1},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 276, 50, 34}
+    },
+    term: 1
+  },
+  2 => %{
+    request: %{
+      cid: {3, 1},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 532, 58, 69}
+    },
+    term: 1
+  },
+  3 => %{
+    request: %{
+      cid: {1, 1},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 863, 21, 6}
+    },
+    term: 1
+  },
+  4 => %{
+    request: %{
+      cid: {2, 2},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 810, 58, 11}
+    },
+    term: 1
+  },
+  5 => %{
+    request: %{
+      cid: {3, 2},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 533, 50, 100}
+    },
+    term: 1
+  },
+  6 => %{
+    request: %{
+      cid: {2, 3},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 248, 11, 85}
+    },
+    term: 1
+  },
+  7 => %{
+    request: %{
+      cid: {1, 2},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 295, 2, 89}
+    },
+    term: 1
+  }
+}
+Leader 3 received client request %{cid: {1, 2}, clientP: #PID<18523.147.0>, cmd: {:MOVE, 295, 2, 89}}
+Leader 3 reply client request %{cid: {1, 2}, clientP: #PID<18523.147.0>, cmd: {:MOVE, 295, 2, 89}}
+Before processing request. Leader 3 log: %{
+  1 => %{
+    request: %{
+      cid: {2, 1},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 276, 50, 34}
+    },
+    term: 1
+  },
+  2 => %{
+    request: %{
+      cid: {3, 1},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 532, 58, 69}
+    },
+    term: 1
+  },
+  3 => %{
+    request: %{
+      cid: {1, 1},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 863, 21, 6}
+    },
+    term: 1
+  },
+  4 => %{
+    request: %{
+      cid: {2, 2},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 810, 58, 11}
+    },
+    term: 1
+  },
+  5 => %{
+    request: %{
+      cid: {3, 2},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 533, 50, 100}
+    },
+    term: 1
+  },
+  6 => %{
+    request: %{
+      cid: {2, 3},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 248, 11, 85}
+    },
+    term: 1
+  },
+  7 => %{
+    request: %{
+      cid: {1, 2},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 295, 2, 89}
+    },
+    term: 1
+  }
+}
+After processing request. Leader 3log: %{
+  1 => %{
+    request: %{
+      cid: {2, 1},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 276, 50, 34}
+    },
+    term: 1
+  },
+  2 => %{
+    request: %{
+      cid: {3, 1},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 532, 58, 69}
+    },
+    term: 1
+  },
+  3 => %{
+    request: %{
+      cid: {1, 1},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 863, 21, 6}
+    },
+    term: 1
+  },
+  4 => %{
+    request: %{
+      cid: {2, 2},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 810, 58, 11}
+    },
+    term: 1
+  },
+  5 => %{
+    request: %{
+      cid: {3, 2},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 533, 50, 100}
+    },
+    term: 1
+  },
+  6 => %{
+    request: %{
+      cid: {2, 3},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 248, 11, 85}
+    },
+    term: 1
+  },
+  7 => %{
+    request: %{
+      cid: {1, 2},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 295, 2, 89}
+    },
+    term: 1
+  },
+  8 => %{
+    request: %{
+      cid: {1, 3},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 468, 5, 44}
+    },
+    term: 1
+  }
+}
+Leader 3 received client request %{cid: {1, 3}, clientP: #PID<18523.147.0>, cmd: {:MOVE, 468, 5, 44}}
+Leader 3 reply client request %{cid: {1, 3}, clientP: #PID<18523.147.0>, cmd: {:MOVE, 468, 5, 44}}
+Node client1_31_yeliu@127.0.0.1 Going to Sleep - Client 1 all requests completed = 3
+Leader 3 received applied request %{cid: {3, 2}, clientP: #PID<18522.147.0>, cmd: {:MOVE, 533, 50, 100}} from client, just reply.
+Leader 3 received client request %{cid: {3, 2}, clientP: #PID<18522.147.0>, cmd: {:MOVE, 533, 50, 100}}
+Before processing request. Leader 3 log: %{
+  1 => %{
+    request: %{
+      cid: {2, 1},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 276, 50, 34}
+    },
+    term: 1
+  },
+  2 => %{
+    request: %{
+      cid: {3, 1},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 532, 58, 69}
+    },
+    term: 1
+  },
+  3 => %{
+    request: %{
+      cid: {1, 1},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 863, 21, 6}
+    },
+    term: 1
+  },
+  4 => %{
+    request: %{
+      cid: {2, 2},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 810, 58, 11}
+    },
+    term: 1
+  },
+  5 => %{
+    request: %{
+      cid: {3, 2},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 533, 50, 100}
+    },
+    term: 1
+  },
+  6 => %{
+    request: %{
+      cid: {2, 3},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 248, 11, 85}
+    },
+    term: 1
+  },
+  7 => %{
+    request: %{
+      cid: {1, 2},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 295, 2, 89}
+    },
+    term: 1
+  },
+  8 => %{
+    request: %{
+      cid: {1, 3},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 468, 5, 44}
+    },
+    term: 1
+  }
+}
+After processing request. Leader 3log: %{
+  1 => %{
+    request: %{
+      cid: {2, 1},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 276, 50, 34}
+    },
+    term: 1
+  },
+  2 => %{
+    request: %{
+      cid: {3, 1},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 532, 58, 69}
+    },
+    term: 1
+  },
+  3 => %{
+    request: %{
+      cid: {1, 1},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 863, 21, 6}
+    },
+    term: 1
+  },
+  4 => %{
+    request: %{
+      cid: {2, 2},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 810, 58, 11}
+    },
+    term: 1
+  },
+  5 => %{
+    request: %{
+      cid: {3, 2},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 533, 50, 100}
+    },
+    term: 1
+  },
+  6 => %{
+    request: %{
+      cid: {2, 3},
+      clientP: #PID<18524.146.0>,
+      cmd: {:MOVE, 248, 11, 85}
+    },
+    term: 1
+  },
+  7 => %{
+    request: %{
+      cid: {1, 2},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 295, 2, 89}
+    },
+    term: 1
+  },
+  8 => %{
+    request: %{
+      cid: {1, 3},
+      clientP: #PID<18523.147.0>,
+      cmd: {:MOVE, 468, 5, 44}
+    },
+    term: 1
+  },
+  9 => %{
+    request: %{
+      cid: {3, 3},
+      clientP: #PID<18522.147.0>,
+      cmd: {:MOVE, 534, 51, 89}
+    },
+    term: 1
+  }
+}
+Leader 3 received client request %{cid: {3, 3}, clientP: #PID<18522.147.0>, cmd: {:MOVE, 534, 51, 89}}
+Node client2_31_yeliu@127.0.0.1 Going to Sleep - Client 2 all requests completed = 3
+Leader 3 reply client request %{cid: {3, 3}, clientP: #PID<18522.147.0>, cmd: {:MOVE, 534, 51, 89}}
+Node client3_31_yeliu@127.0.0.1 Going to Sleep - Client 3 all requests completed = 3
+Leader 3 received applied request %{cid: {2, 3}, clientP: #PID<18524.146.0>, cmd: {:MOVE, 248, 11, 85}} from client, just reply.
+Leader 3 received client request %{cid: {2, 3}, clientP: #PID<18524.146.0>, cmd: {:MOVE, 248, 11, 85}}
+  time = 1000 client requests seen = [{3, 9}]
+  time = 1000      db updates done = [{1, 9}, {2, 9}, {3, 9}]
+
+  time = 2000 client requests seen = [{3, 9}]
+  time = 2000      db updates done = [{1, 9}, {2, 9}, {3, 9}]
+
+  time = 3000 client requests seen = [{3, 9}]
+  time = 3000      db updates done = [{1, 9}, {2, 9}, {3, 9}]
+
+  time = 4000 client requests seen = [{3, 9}]
+  time = 4000      db updates done = [{1, 9}, {2, 9}, {3, 9}]
+
+  time = 5000 client requests seen = [{3, 9}]
+  time = 5000      db updates done = [{1, 9}, {2, 9}, {3, 9}]
+
+  time = 6000 client requests seen = [{3, 9}]
+  time = 6000      db updates done = [{1, 9}, {2, 9}, {3, 9}]
+
+  time = 7000 client requests seen = [{3, 9}]
+  time = 7000      db updates done = [{1, 9}, {2, 9}, {3, 9}]
+
+  time = 8000 client requests seen = [{3, 9}]
+  time = 8000      db updates done = [{1, 9}, {2, 9}, {3, 9}]
+
+  time = 9000 client requests seen = [{3, 9}]
+  time = 9000      db updates done = [{1, 9}, {2, 9}, {3, 9}]
+
+  time = 10000 client requests seen = [{3, 9}]
+  time = 10000      db updates done = [{1, 9}, {2, 9}, {3, 9}]
+
+  time = 11000 client requests seen = [{3, 9}]
+  time = 11000      db updates done = [{1, 9}, {2, 9}, {3, 9}]
+
+  time = 12000 client requests seen = [{3, 9}]
+  time = 12000      db updates done = [{1, 9}, {2, 9}, {3, 9}]
+
+  time = 13000 client requests seen = [{3, 9}]
+  time = 13000      db updates done = [{1, 9}, {2, 9}, {3, 9}]
+
+  time = 14000 client requests seen = [{3, 9}]
+  time = 14000      db updates done = [{1, 9}, {2, 9}, {3, 9}]
+
+  Node server3_31_yeliu@127.0.0.1 exiting - maxtime reached
+  Node client5_31_yeliu@127.0.0.1 exiting - maxtime reached
+  Node client1_31_yeliu@127.0.0.1 exiting - maxtime reached
+  Node client3_31_yeliu@127.0.0.1 exiting - maxtime reached
+  Node client2_31_yeliu@127.0.0.1 exiting - maxtime reached
+  Node server4_31_yeliu@127.0.0.1 exiting - maxtime reached
+  Node server1_31_yeliu@127.0.0.1 exiting - maxtime reached
+  Node server5_31_yeliu@127.0.0.1 exiting - maxtime reached
+  Node server2_31_yeliu@127.0.0.1 exiting - maxtime reached
+  Node client4_31_yeliu@127.0.0.1 exiting - maxtime reached
+  Node raft_31_yeliu@127.0.0.1 exiting - maxtime reached
+  time = 15000 client requests seen = [{3, 9}]
+  time = 15000      db updates done = [{1, 9}, {2, 9}, {3, 9}]
