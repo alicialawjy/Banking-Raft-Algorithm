@@ -1,5 +1,5 @@
 
-# distributed algorithms, Alicia Law and Ye Liu, 19 Feb 2022
+# distributed algorithms, Alicia Law(ajl115) and Ye Liu(yl10321), 8 feb 2022
 # coursework, raft consensus, v2
 
 defmodule Server do
