@@ -11,7 +11,7 @@ def start(config, server_num) do
   config = config
     |> Configuration.node_info("Server", server_num)
     |> Debug.node_starting()
-  #IO.puts "server #{server_num} starts"
+    # IO.puts "server #{server_num} starts"
 
   receive do
   { :BIND, servers, databaseP } ->
@@ -72,17 +72,16 @@ def next(s) do
 
   # If the vote reply was for an old election, discard:
   { :VOTE_REPLY, follower_num, follower_curr_term } when follower_curr_term < curr_term ->
-    # #IO.puts("Old Vote Reply from Server #{follower_num} to Server #{s.server_num}. Ignored.")
+    # IO.puts("Old Vote Reply from Server #{follower_num} to Server #{s.server_num}. Ignored.")
     s
 
   # Else if, the server is still a candidate and vote reply is for this term's election, accept:
   { :VOTE_REPLY, follower_num, follower_curr_term } = msg when s.role == :CANDIDATE ->
-    # #IO.puts("Server #{s.server_num} received Server #{follower_num}'s vote reply. Processing.")
     s = Vote.receive_vote_reply_from_follower(s, follower_num, follower_curr_term)
 
   # Else, server is no longer a Candidate (either Follower/Leader), ignore:
   { :VOTE_REPLY, follower_num, _follower_curr_term } ->
-    # #IO.puts("#{s.role} Server #{follower_num} received Server #{s.server_num} vote reply. Ignored.")
+    # IO.puts("Server #{follower_num} is currently a #{s.role}. Ignored vote reply.")
     s
 
     # __________________ IV. LEADER ELECTED ____________________ #
@@ -92,14 +91,9 @@ def next(s) do
     #   - leaderP          : leader's <PID>
     #   - leader_curr_term : leader's current term
 
-    # Run to test 1 round of election.
-    # {:LEADER_ELECTED, _candidate_num, candidate_curr_term} ->
-    #   #IO.puts("leader message received")
-    #   Process.exit(s.selfP, :kill)
-
     # If it is a old leader elected message, ignore.
     {:LEADER_ELECTED, _leaderP, leader_curr_term} when leader_curr_term < curr_term ->
-      #IO.puts("Old leader message (From term #{leader_curr_term}, Now term #{curr_term}). Discard message.")
+      # IO.puts("Old leader message (From term #{leader_curr_term}, Now term #{curr_term}). Discard message.")
       s
 
     # Otherwise, process new leader.
@@ -113,7 +107,7 @@ def next(s) do
   # ------------------------------------------------------- #
 
   # ______________ I. APPEND-ENTRIES REQUEST ______________ #
-  # From: Leader --> To: Followers
+  # From: Leader >> To: Followers
   # Description: received aeRequest from leader
   # Message Variables:
   #   - leaderTerm    : leader's curr_term
@@ -124,100 +118,118 @@ def next(s) do
 
   # Heartbeat
   { :APPEND_ENTRIES_REQUEST, _leaderTerm, _commitIndex } ->
-    # #IO.puts("Server #{s.server_num} received heartbeat, restarting timer - Line 125 server.ex")
+    # IO.puts("Server #{s.server_num} received heartbeat, restarting timer - Line 121 server.ex")
     s = Timer.restart_election_timer(s)
 
   # New Append Entries Request
   { :APPEND_ENTRIES_REQUEST, leaderTerm, prevIndex, prevTerm, leaderEntries, commitIndex} ->
-    # #IO.puts("Server #{s.server_num} received aeReq from leader, processing - Line 130 server.ex")
+    # IO.puts("Server #{s.server_num} received aeReq from leader, processing - Line 126 server.ex")
     s = s
       |> Timer.restart_election_timer()
       |> AppendEntries.receive_append_entries_request(leaderTerm, prevIndex, prevTerm, leaderEntries, commitIndex)
 
 
   # ______________ II. APPEND-ENTRIES REPLY ______________ #
-  # If leader
+  # From: Follower >> To: Leader
+  # Description: response to the aeRequest sent by leader previously. Could either be a success/ failure.
+
+  # If server is indeed a leader,
   {:APPEND_ENTRIES_REPLY, followerP, followerTerm, success, followerLastIndex} when s.role == :LEADER ->
-    # If follower term larger than mine, stepdown:
+    # If received reply from a follower with a larger term, stepdown:
     s = if followerTerm > curr_term do
-      #IO.puts("Leader term #{s.curr_term} smaller than follower term #{followerTerm}, stepdown")
+      # IO.puts("Leader term #{s.curr_term} smaller than follower term #{followerTerm}, stepdown")
       s = Vote.stepdown(s, followerTerm)
+    # Otherwise, process reply
     else
-      # #IO.puts("Leader #{s.server_num} processing aeReply")
       s = AppendEntries.receive_append_entries_reply_from_follower(s, followerP, followerTerm, success, followerLastIndex)
     end
     s
 
-  # If not leader, ignore:
+  # If server is not a leader, ignore:
   {:APPEND_ENTRIES_REPLY, _followerP, _followerTerm, _success, _followerLastIndex} ->
-    # #IO.puts("Server #{s.server_num} ignored aeReply as no longer leader")
+    # IO.puts("Server #{s.server_num} ignored aeReply as no longer leader")
     s
 
-
   # ______________ III. APPEND-ENTRIES TIMEOUT ______________ #
-  { :APPEND_ENTRIES_TIMEOUT, term, followerP } = msg ->   # Leader >> Leader
+  # From: Leader >> To: Leader
+  # Description: when append-entries timer for a follower runsout, resend aeRequests/ heartbeats to follower.
+
+  { :APPEND_ENTRIES_TIMEOUT, term, followerP } ->
+    # If server is still a leader and the timeout is for the current term, process it
     s = if s.role == :LEADER && term == curr_term do
-      # #IO.puts("Leader received aeTimeout")
       s = s
-      |> Debug.message("-atim", msg)
       |> AppendEntries.send_entries_to_followers(followerP)
+
+    # Otherwise, this is an outdated message, ignore.
     else
-      # #IO.puts("Server received outdated aeTimeout (either not leader/ from older term")
+      # IO.puts("Server received outdated aeTimeout (either not leader/ from older term")
       s
     end
 
     s
 
-  # ------------------------------------------------------- #
-  # ------------------- CLIENT REQUESTS ------------------- #
-  # ------------------------------------------------------- #
+  # ______________ IV. COMMIT_ENTRIES_REQUEST ______________ #
+  # From: Leader >> To: Followers
+  # Description: Sent after a leader has replicated its logs to its database.
+  #              Followers instructed to replicate logs to database.
 
-  { :CLIENT_REQUEST, m } = msg when s.role == :LEADER ->                  # Client >> Leader
-    s = s
-      |> Debug.message("-creq", msg)
-      |> ClientReq.receive_request_from_client(m)
-    # IO.inspect(s.log, label: "Leader logs - server.ex Line 179")
-    s
-
-  { :CLIENT_REQUEST, m } = msg ->                                         # Client >> Follower/Candidate (IGNORE)
-   send m.clientP, {:CLIENT_REPLY, m.cid, :NOT_LEADER, s.leaderP, s.server_num}
-    s
-
-  # ------------------------------------------------------- #
-  # --------------------- DB MESSAGES --------------------- #
-  # ------------------------------------------------------- #
-  { :DB_REPLY, _result, db_seqnum, client_request } when s.role == :LEADER ->     # DB Replication successful for leader
-    s = ClientReq.receive_reply_from_db(s, db_seqnum, client_request)
-    # #IO.puts("Database replicated log #{inspect (client_request)}")
-    s
-
-  { :DB_REPLY, _result, db_seqnum, client_request } when s.last_applied < db_seqnum ->   # DB Replication successful for follower/candidate
-    s = State.last_applied(s, db_seqnum)
-    # #IO.puts("Commit request log #{inspect (client_request)} to local database")
-    s
-
-  { :DB_REPLY, _result, _db_seqnum, client_request } -> # catch misordered messages
-    # #IO.puts("Ignore dbReply for log #{inspect (client_request)}")
-    s
-
-  {:COMMIT_ENTRIES_REQUEST, db_seqnum} when db_seqnum > s.last_applied -> # database send reply to leader, then follower can commit the request to its local machine
+  # If the log has not been replicated to the server's database, replicate
+  {:COMMIT_ENTRIES_REQUEST, db_seqnum} when db_seqnum > s.last_applied ->
     for index <- (s.last_applied+1)..min(db_seqnum, s.commit_index) do
-      # #IO.puts("Follower committ log #{index} to database")
+      # IO.puts("Follower committing log #{index} to database")
       send s.databaseP, { :DB_REQUEST, Log.request_at(s, index), index}
     end
     s
 
-  {:COMMIT_ENTRIES_REQUEST, db_seqnum} -> # follower ignore the request which has lower index than last_applied
-    # #IO.puts("Follower already committed log #{db_seqnum} to database")
+  # If already replicated, ignore the request
+  {:COMMIT_ENTRIES_REQUEST, db_seqnum} ->
+    # IO.puts("Follower already committed log #{db_seqnum} to database")
     s
 
-  # { :DB_RESULT, result, db_seqnum } ->                       # DB Replication unsucessful - did not match db sequence
-  #   #IO.puts("Database did not replicate log #{db_seqnum}.")
-  #   s
+  # ------------------------------------------------------- #
+  # ------------------- CLIENT REQUESTS ------------------- #
+  # ------------------------------------------------------- #
+  # From: Leader >> To: Leader
+  # Description: When client has a request.
+
+  # If server is a leader, process client request
+  { :CLIENT_REQUEST, m } when s.role == :LEADER ->
+    s = s |> ClientReq.receive_request_from_client(m)
+    s
+
+  # If server is not a leader (i.e. candidate/follower),
+  # reply client that it is :NOT_LEADER and inform them of the current leader
+  { :CLIENT_REQUEST, m } ->
+   send m.clientP, {:CLIENT_REPLY, m.cid, :NOT_LEADER, s.leaderP, s.server_num}
+   s
+
+  # ------------------------------------------------------- #
+  # --------------------- DB MESSAGES --------------------- #
+  # ------------------------------------------------------- #
+  # From: Database >> To: Server
+  # Description: Informs the status of log replication in the database
+
+  # If db replication was successful for leader
+  { :DB_REPLY, _result, db_seqnum, client_request } when s.role == :LEADER ->
+    s = ClientReq.receive_reply_from_db(s, db_seqnum, client_request)
+    s
+
+  # If db replication was successful for follower/ candidate
+  { :DB_REPLY, _result, db_seqnum, client_request } when s.last_applied < db_seqnum ->
+    s = State.last_applied(s, db_seqnum)
+    # IO.puts("Successfully committed log #{inspect (client_request)} to local database")
+    s
+
+  # Otherwise, ignore
+  { :DB_REPLY, _result, _db_seqnum, client_request } ->
+    # IO.puts("Ignore dbReply for log #{inspect (client_request)}")
+    s
 
   # ------------------------------------------------------- #
   # ---------------------- UNEXPECTED --------------------- #
   # ------------------------------------------------------- #
+  # Halt node if received unexpected messages
+
     unexpected ->
       Helper.node_halt("************* Server: unexpected message #{inspect unexpected}")
 
