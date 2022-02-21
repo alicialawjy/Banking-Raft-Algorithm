@@ -1,0 +1,43 @@
+mix compile
+-------------------------------------------------------------------
+Server 3 runs for candidate in term 1
+Server 4 runs for candidate in term 1
+Server 2 stepdown at receiving vote request
+Server 1 stepdown at receiving vote request
+Processed vote from Server 2 for Server 3
+Processed vote from Server 1 for Server 3
+New leader elected! Server 3 is leader for Term 1
+
+Leader 3 got votes from #MapSet<[1, 2, 3]>
+Server 1 runs for candidate in term 2
+Server 4 stepdown at receiving vote request
+Processed vote from Server 4 for Server 1
+Server 2 stepdown at receiving vote request
+Processed vote from Server 2 for Server 1
+New leader elected! Server 1 is leader for Term 2
+
+Leader 1 got votes from #MapSet<[1, 2, 4]>
+Server 2 runs for candidate in term 3
+Server 4 stepdown at receiving vote request
+Processed vote from Server 4 for Server 2
+Server 4 runs for candidate in term 4
+Server 2 stepdown at receiving vote request
+Processed vote from Server 2 for Server 4
+Server 4 runs for candidate in term 5
+Server 2 stepdown at receiving vote request
+Processed vote from Server 2 for Server 4
+Server 4 runs for candidate in term 6
+Server 2 stepdown at receiving vote request
+Processed vote from Server 2 for Server 4
+Server 4 runs for candidate in term 7
+Server 2 stepdown at receiving vote request
+Processed vote from Server 2 for Server 4
+Server 2 runs for candidate in term 8
+Server 4 stepdown at receiving vote request
+Processed vote from Server 4 for Server 2
+Server 2 runs for candidate in term 9
+Server 4 stepdown at receiving vote request
+Processed vote from Server 4 for Server 2
+Server 2 runs for candidate in term 10
+Server 4 stepdown at receiving vote request
+Processed vote from Server 4 for Server 2
