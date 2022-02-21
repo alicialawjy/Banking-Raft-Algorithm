@@ -19,6 +19,7 @@ def receive_request_from_client(leader, m) do
   # (ii) If client request has already been applied to database, just send :CLIENT_REPLY to client
   if status == :APPLIED_REQ do
     send m.clientP, { :CLIENT_REPLY, m.cid, m, leader.selfP, leader.server_num }
+    # IO.puts("received applied request #{inspect m} from client, just reply.")
     leader
   end
 
@@ -26,6 +27,7 @@ def receive_request_from_client(leader, m) do
   leader = if status == :NEW_REQ do
     leader = Log.append_entry(leader, %{request: m, term: leader.curr_term})    # append client request to leader's log
     leader = State.commit_index(leader, Log.last_index(leader))                 # update the commit index for in the logs
+    # IO.inspect(leader.log, label: "Received request from client. Leader log")
     leader
   else
     leader

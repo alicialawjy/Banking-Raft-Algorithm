@@ -95,12 +95,9 @@ def receive_reply_from_leader(c, cid) do
       |> Client.result(reply)
       |> Client.leaderP(leaderP)
       |> Monitor.send_msg({ :CLIENT_REQUEST, leader_num })
-
-    # IO.inspect(c.result, label: "client result")
     c
 
   { :CLIENT_REPLY, m_cid, _reply, _leaderP, _leaderNum } when m_cid < cid ->
-    # #IO.puts("client receive old #{inspect(m_cid)} #{inspect(cid)} reply from leader")
     c |> Client.receive_reply_from_leader(cid)
 
   { :CLIENT_TIMELIMIT } ->

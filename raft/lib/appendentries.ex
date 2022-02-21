@@ -21,6 +21,7 @@ defmodule AppendEntries do
 
       # send append entries request to follower
       Timer.restart_append_entries_timer(leader,followerP)
+      # IO.puts("leader #{leader.server_num} sending entries to #{inspect(followerP)}")
       send followerP, { :APPEND_ENTRIES_REQUEST, leader.curr_term, followerPrevIndex, prevTerm, entries, leader.commit_index}
       leader
 
@@ -28,6 +29,7 @@ defmodule AppendEntries do
     else
       Timer.restart_append_entries_timer(leader,followerP)
       send followerP, { :APPEND_ENTRIES_REQUEST, leader.curr_term, leader.commit_index }
+      # IO.puts("Followers are up-to-date. Sending heartbeats.")
       leader
     end
     leader
@@ -45,6 +47,7 @@ defmodule AppendEntries do
 
     # (i) If I am a candidate/ leader but received an append entries request from someone with a larger term, stepdown:
     s = if s.role != :FOLLOWER && s.curr_term < leaderTerm do
+      # IO.puts("Leader to stepdown as received aeReq from another leader of larger term")
       s = Vote.stepdown(s, leaderTerm)
     else
       s
@@ -52,6 +55,7 @@ defmodule AppendEntries do
 
     # (ii) If my current term is larger than the leader's, reject leader
     if s.curr_term > leaderTerm do
+      # IO.puts("Server #{s.server_num} rejecting aeReq from leader bec have a larger term")
       send s.leaderP, {:APPEND_ENTRIES_REPLY, s.selfP, s.curr_term, false, nil}
     end # if
 
@@ -82,6 +86,8 @@ defmodule AppendEntries do
   #   - entries             : entries to append to follower's log
   #   - commitIndex         : leader's commit_index
 
+    # IO.inspect(s.log, label: "Server logs before storeEntries")
+
     # (i) Find the point in the entry to start appending
     breakPointList = for {index, v} <- entries do
       if Log.last_index(s) >= index do
@@ -107,6 +113,7 @@ defmodule AppendEntries do
     s = if breakPoint != nil && breakPoint < Log.last_index(s) do
       s = s|>
       Log.delete_entries_from(breakPoint)               # delete entries from the point where diverge with leader
+      # IO.inspect(s.log, label: "Server #{s.server_num}'s logs after delete_entries_from")
       s
     else
       s
@@ -116,8 +123,10 @@ defmodule AppendEntries do
     s = if entries != %{} do
       s = Log.merge_entries(s, entries)                 # append missing entries
       s = State.commit_index(s, Log.last_index(s))      # update commit index (for logs)
+      # IO.inspect(s.log, label: "Server #{s.server_num}'s logs after storeEntries")
       s
     else
+      # IO.puts("already updated. Server #{s.server_num}'s logs stay the same")
       s
     end
     s
@@ -162,6 +171,7 @@ defmodule AppendEntries do
    for {index, c} <- counter do
     # If leader received majority reply from followers, notify the local database to store the request
     if c >= s.majority do
+      # IO.puts "leader got majority reply, sending request #{index} to database"
       send s.databaseP, {:DB_REQUEST, Log.request_at(s, index), index}
     else
       # IO.puts "do not commit request #{index}"

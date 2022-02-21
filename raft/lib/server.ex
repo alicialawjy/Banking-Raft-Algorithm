@@ -37,7 +37,7 @@ def next(s) do
 
   # If the election timeout message was from an old term, ignore:
   { :ELECTION_TIMEOUT, mterm, _melection } when mterm < curr_term ->
-    # #IO.puts("Server #{s.server_num} ignored old election timeout: message term = #{mterm} but curr_term = #{curr_term}")
+    #IO.puts("Server #{s.server_num} ignored old election timeout: message term = #{mterm} but curr_term = #{curr_term}")
     s
 
   # Otherwise (mterm > curr_term) and if message sent to Follower/Candidate (not Leader), process it:
